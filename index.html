@@ -53,7 +53,7 @@
                             class="w-full h-32 p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none text-gray-700"
                         ></textarea>
                         <div class="text-right mt-2">
-                            <span id="charCount" class="text-sm text-gray-500">0/500 karakter</span>
+                            <span id="charCount" class="text-sm text-gray-500">0/2500 karakter</span>
                         </div>
                     </div>
 
@@ -83,22 +83,22 @@
                                 </div>
                             </label>
                             
-                            <!-- Ibu Ani - Wanita Dewasa -->
+                            <!-- Pak Andi - Pria Dewasa -->
                             <label class="cursor-pointer">
                                 <input type="radio" name="voice" value="id-ID-Standard-C" class="sr-only">
                                 <div class="voice-option border-2 border-gray-200 bg-gray-50 rounded-xl p-3 text-center transition-all hover:shadow-md">
-                                    <div class="text-2xl mb-1">👩‍🏫</div>
-                                    <div class="font-medium text-gray-800 text-sm">Ibu Ani</div>
-                                    <div class="text-xs text-gray-600">Wanita dewasa, lembut</div>
+                                    <div class="text-2xl mb-1">👨‍🏫</div>
+                                    <div class="font-medium text-gray-800 text-sm">Pak Andi</div>
+                                    <div class="text-xs text-gray-600">Pria dewasa, tegas</div>
                                 </div>
                             </label>
                             
-                            <!-- Andi - Pria Muda -->
+                            <!-- Doni - Pria Muda -->
                             <label class="cursor-pointer">
                                 <input type="radio" name="voice" value="id-ID-Standard-D" class="sr-only">
                                 <div class="voice-option border-2 border-gray-200 bg-gray-50 rounded-xl p-3 text-center transition-all hover:shadow-md">
                                     <div class="text-2xl mb-1">👨‍🎤</div>
-                                    <div class="font-medium text-gray-800 text-sm">Andi</div>
+                                    <div class="font-medium text-gray-800 text-sm">Doni</div>
                                     <div class="text-xs text-gray-600">Pria muda, energik</div>
                                 </div>
                             </label>
@@ -123,13 +123,13 @@
                                 </div>
                             </label>
                             
-                            <!-- Tante Rina - Wanita Ramah -->
+                            <!-- Ibu Rina - Wanita Ramah -->
                             <label class="cursor-pointer">
                                 <input type="radio" name="voice" value="id-ID-Wavenet-C" class="sr-only">
                                 <div class="voice-option border-2 border-gray-200 bg-gray-50 rounded-xl p-3 text-center transition-all hover:shadow-md">
                                     <div class="text-2xl mb-1">👩‍🍳</div>
-                                    <div class="font-medium text-gray-800 text-sm">Tante Rina</div>
-                                    <div class="text-xs text-gray-600">Ramah, hangat</div>
+                                    <div class="font-medium text-gray-800 text-sm">Ibu Rina</div>
+                                    <div class="text-xs text-gray-600">Wanita ramah, hangat</div>
                                 </div>
                             </label>
                             
@@ -163,13 +163,13 @@
                                 </div>
                             </label>
                             
-                            <!-- Kak Sinta - Kakak Perempuan -->
+                            <!-- Sinta - Wanita Kreatif -->
                             <label class="cursor-pointer">
                                 <input type="radio" name="voice" value="id-ID-Neural2-C" class="sr-only">
                                 <div class="voice-option border-2 border-gray-200 bg-gray-50 rounded-xl p-3 text-center transition-all hover:shadow-md">
                                     <div class="text-2xl mb-1">👩‍🎨</div>
-                                    <div class="font-medium text-gray-800 text-sm">Kak Sinta</div>
-                                    <div class="text-xs text-gray-600">Kakak, sabar</div>
+                                    <div class="font-medium text-gray-800 text-sm">Sinta</div>
+                                    <div class="text-xs text-gray-600">Wanita kreatif, sabar</div>
                                 </div>
                             </label>
                             
@@ -405,15 +405,15 @@
         const voiceCharacters = {
             'id-ID-Standard-A': { name: 'Sari', desc: 'Wanita muda, ceria' },
             'id-ID-Standard-B': { name: 'Budi', desc: 'Pria dewasa, tegas' },
-            'id-ID-Standard-C': { name: 'Ibu Ani', desc: 'Wanita dewasa, lembut' },
-            'id-ID-Standard-D': { name: 'Andi', desc: 'Pria muda, energik' },
+            'id-ID-Standard-C': { name: 'Pak Andi', desc: 'Pria dewasa, tegas' },
+            'id-ID-Standard-D': { name: 'Doni', desc: 'Pria muda, energik' },
             'id-ID-Wavenet-A': { name: 'Dr. Maya', desc: 'Profesional, jelas' },
             'id-ID-Wavenet-B': { name: 'Pak Joko', desc: 'Berpengalaman, bijak' },
-            'id-ID-Wavenet-C': { name: 'Tante Rina', desc: 'Ramah, hangat' },
+            'id-ID-Wavenet-C': { name: 'Ibu Rina', desc: 'Wanita ramah, hangat' },
             'id-ID-Wavenet-D': { name: 'Dimas', desc: 'Santai, kreatif' },
             'id-ID-Neural2-A': { name: 'Putri', desc: 'Elegan, berkelas' },
             'id-ID-Neural2-B': { name: 'Reza', desc: 'Modern, tech-savvy' },
-            'id-ID-Neural2-C': { name: 'Kak Sinta', desc: 'Kakak, sabar' },
+            'id-ID-Neural2-C': { name: 'Sinta', desc: 'Wanita kreatif, sabar' },
             'id-ID-Neural2-D': { name: 'Mas Agus', desc: 'Abang Jakarta, ramah' }
         };
 
@@ -433,11 +433,11 @@
         // Character counter
         textInput.addEventListener('input', function() {
             const length = this.value.length;
-            charCount.textContent = `${length}/500 karakter`;
+            charCount.textContent = `${length}/2500 karakter`;
             
-            if (length > 500) {
-                this.value = this.value.substring(0, 500);
-                charCount.textContent = '500/500 karakter';
+            if (length > 2500) {
+                this.value = this.value.substring(0, 2500);
+                charCount.textContent = '2500/2500 karakter';
             }
         });
 
@@ -598,5 +598,5 @@
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98070e8ba6c49c7d',t:'MTc1ODA5NTg4OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98072c2b605840d9',t:'MTc1ODA5NzEwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
