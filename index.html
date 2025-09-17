@@ -41,43 +41,18 @@
             <p class="text-gray-600 text-sm">Powered by Google AI Studio</p>
         </div>
 
-        <!-- Configuration Notice -->
-        <div id="configNotice" class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-            <p class="text-xs text-yellow-800">
-                <strong>⚠️ Demo Mode:</strong> Masukkan Google AI Studio API Key untuk production
-            </p>
-        </div>
 
-        <!-- API Key Input -->
-        <div class="bg-white rounded-xl shadow-lg p-4 mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Google AI Studio API Key</label>
-            <div class="flex space-x-2">
-                <input 
-                    type="password" 
-                    id="apiKeyInput" 
-                    placeholder="Masukkan API Key dari Google AI Studio..."
-                    class="flex-1 p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                <button 
-                    id="saveApiKeyBtn"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                >
-                    Simpan
-                </button>
-            </div>
-            <p class="text-xs text-gray-500 mt-2">
-                Dapatkan API key gratis di: <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-600 hover:underline">Google AI Studio</a>
-            </p>
-        </div>
+
+
 
         <!-- AI Text Generation -->
         <div class="bg-white rounded-xl shadow-lg p-4 mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">🤖 AI Text Generator</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">🤖 Generator Teks AI</label>
             <div class="flex space-x-2 mb-3">
                 <input 
                     type="text" 
                     id="aiPromptInput" 
-                    placeholder="Describe what you want to say..."
+                    placeholder="Deskripsikan teks yang ingin dibuat..."
                     class="flex-1 p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                 <button 
@@ -85,14 +60,14 @@
                     class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1"
                 >
                     <span id="generateTextIcon">✨</span>
-                    <span>Generate</span>
+                    <span>Buat</span>
                 </button>
             </div>
             <div class="flex flex-wrap gap-1 mb-2">
-                <button class="quick-prompt text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded transition-colors" data-prompt="Write a professional introduction for a company presentation">📊 Company Intro</button>
-                <button class="quick-prompt text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded transition-colors" data-prompt="Create a motivational speech about achieving goals">🎯 Motivational</button>
-                <button class="quick-prompt text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded transition-colors" data-prompt="Write a friendly customer service greeting">🤝 Customer Service</button>
-                <button class="quick-prompt text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded transition-colors" data-prompt="Create a product announcement for a new app">📱 Product Launch</button>
+                <button class="quick-prompt text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded transition-colors" data-prompt="Buatkan perkenalan profesional untuk presentasi perusahaan">📊 Intro Perusahaan</button>
+                <button class="quick-prompt text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded transition-colors" data-prompt="Buatkan pidato motivasi tentang mencapai tujuan">🎯 Motivasi</button>
+                <button class="quick-prompt text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded transition-colors" data-prompt="Buatkan sapaan ramah untuk customer service">🤝 Customer Service</button>
+                <button class="quick-prompt text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded transition-colors" data-prompt="Buatkan pengumuman produk untuk aplikasi baru">📱 Peluncuran Produk</button>
             </div>
         </div>
 
@@ -101,9 +76,9 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Teks untuk Speech</label>
             <textarea 
                 id="textInput" 
-                placeholder="Type text to convert to speech or use AI generator above..."
+                placeholder="Ketik teks untuk diubah menjadi suara atau gunakan generator AI di atas..."
                 class="w-full h-24 p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >Hello, this is a demo of Google AI Studio text to speech. The voice quality is excellent and natural.</textarea>
+            >Halo, ini adalah demo text to speech menggunakan Google AI Studio. Kualitas suaranya sangat bagus dan natural.</textarea>
         </div>
 
         <!-- Voice Selection -->
@@ -191,7 +166,7 @@
                 class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
             >
                 <span id="generateIcon">🎵</span>
-                <span id="generateText">Generate Speech</span>
+                <span id="generateText">Buat Suara</span>
             </button>
             
             <audio id="audioPlayer" controls class="w-full hidden"></audio>
@@ -234,16 +209,8 @@
         // Load saved API key
         function loadSavedApiKey() {
             // Pre-configured API key
-            apiKey = 'AIzaSyDHkKqBcK8n7wX9mF2pL5tR3vY8qE4uI6o';
-            document.getElementById('apiKeyInput').value = apiKey;
+            apiKey = 'AIzaSyARvi8ZutwlLRay6S8zGRoqQt-wI1-mVUg';
             updateConfigNotice(true);
-            
-            const saved = localStorage.getItem('google_ai_api_key');
-            if (saved) {
-                document.getElementById('apiKeyInput').value = saved;
-                apiKey = saved;
-                updateConfigNotice(true);
-            }
         }
 
         // Check configuration
@@ -253,14 +220,7 @@
 
         // Update config notice
         function updateConfigNotice(hasKey) {
-            const notice = document.getElementById('configNotice');
-            if (hasKey) {
-                notice.className = 'bg-green-50 border border-green-200 rounded-lg p-3 mb-4';
-                notice.innerHTML = '<p class="text-xs text-green-800"><strong>✅ Connected:</strong> Google AI Studio API key configured</p>';
-            } else {
-                notice.className = 'bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4';
-                notice.innerHTML = '<p class="text-xs text-yellow-800"><strong>⚠️ Demo Mode:</strong> Masukkan Google AI Studio API Key untuk production</p>';
-            }
+            // Notice removed - API key is pre-configured
         }
 
         // Load voices
@@ -323,7 +283,7 @@
                 return;
             }
 
-            const previewText = `Hello, I'm ${voice.name}. This is a preview of my voice.`;
+            const previewText = `Halo, saya ${voice.name}. Ini adalah contoh suara saya.`;
             
             // Show loading state
             const originalText = buttonElement.textContent;
@@ -599,7 +559,7 @@
             // Show loading state
             generateBtn.classList.add('loading');
             generateIcon.textContent = '⏳';
-            generateText.textContent = 'Generating...';
+            generateText.textContent = 'Membuat...';
             showStatus('Sedang membuat audio...', 'info');
 
             try {
@@ -620,7 +580,7 @@
                 // Reset button state
                 generateBtn.classList.remove('loading');
                 generateIcon.textContent = '🎵';
-                generateText.textContent = 'Generate Speech';
+                generateText.textContent = 'Buat Suara';
             }
         }
 
@@ -644,5 +604,5 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', init);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9805e267f735cdf9',t:'MTc1ODA4MzU5NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98062fb500caf8fa',t:'MTc1ODA4Njc2Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
