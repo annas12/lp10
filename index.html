@@ -284,31 +284,31 @@
                     throw new Error('Browser tidak mendukung Text-to-Speech');
                 }
 
+                // Get available voices
+                const voices = await getBrowserVoices();
                 const utterance = new SpeechSynthesisUtterance(previewText);
                 
-                // Map our voice IDs to browser voices
-                const voices = speechSynthesis.getVoices();
-                let selectedBrowserVoice = null;
-
-                // Try to find Indonesian or English voices
+                // Select voice based on our voice ID
+                let selectedVoice = null;
+                
                 if (voice.id === 'Kore' || voice.id === 'Aoede') {
                     // Female voices
-                    selectedBrowserVoice = voices.find(v => 
-                        v.lang.includes('id') && v.name.toLowerCase().includes('female')
-                    ) || voices.find(v => 
-                        v.lang.includes('en') && v.name.toLowerCase().includes('female')
-                    ) || voices.find(v => v.name.toLowerCase().includes('female'));
+                    selectedVoice = voices.find(v => v.name.toLowerCase().includes('female')) ||
+                                 voices.find(v => v.name.toLowerCase().includes('woman')) ||
+                                 voices.find(v => v.gender === 'female') ||
+                                 voices.find(v => v.lang.startsWith('en') && !v.name.toLowerCase().includes('male')) ||
+                                 voices[Math.floor(voices.length / 2)];
                 } else {
                     // Male voices
-                    selectedBrowserVoice = voices.find(v => 
-                        v.lang.includes('id') && v.name.toLowerCase().includes('male')
-                    ) || voices.find(v => 
-                        v.lang.includes('en') && v.name.toLowerCase().includes('male')
-                    ) || voices.find(v => v.name.toLowerCase().includes('male'));
+                    selectedVoice = voices.find(v => v.name.toLowerCase().includes('male')) ||
+                                 voices.find(v => v.name.toLowerCase().includes('man')) ||
+                                 voices.find(v => v.gender === 'male') ||
+                                 voices.find(v => v.lang.startsWith('en')) ||
+                                 voices[0];
                 }
 
-                if (selectedBrowserVoice) {
-                    utterance.voice = selectedBrowserVoice;
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
                 }
 
                 utterance.rate = 1;
@@ -322,12 +322,15 @@
                 };
 
                 utterance.onerror = (event) => {
+                    // Reset button state
+                    buttonElement.textContent = originalText;
+                    buttonElement.classList.remove('preview-loading');
                     throw new Error('Gagal preview suara: ' + event.error);
                 };
 
                 // Speak the preview
                 speechSynthesis.speak(utterance);
-                showStatus(`Preview: ${voice.name}`, 'info');
+                showStatus(`Preview: ${voice.name} (${selectedVoice ? selectedVoice.name : 'Default'})`, 'info');
 
             } catch (error) {
                 console.error('Error previewing voice:', error);
@@ -373,61 +376,113 @@
             throw new Error('No text data in response');
         }
 
-        // Generate speech using Web Speech API (browser built-in)
-        async function generateSpeechAPI(text, voiceId) {
-            return new Promise((resolve, reject) => {
-                if (!('speechSynthesis' in window)) {
-                    reject(new Error('Browser tidak mendukung Text-to-Speech'));
-                    return;
-                }
-
-                const utterance = new SpeechSynthesisUtterance(text);
+        // Get available browser voices
+        function getBrowserVoices() {
+            return new Promise((resolve) => {
+                let voices = speechSynthesis.getVoices();
                 
-                // Map our voice IDs to browser voices
-                const voices = speechSynthesis.getVoices();
-                let selectedBrowserVoice = null;
-
-                // Try to find Indonesian or English voices
-                if (voiceId === 'Kore' || voiceId === 'Aoede') {
-                    // Female voices
-                    selectedBrowserVoice = voices.find(voice => 
-                        voice.lang.includes('id') && voice.name.toLowerCase().includes('female')
-                    ) || voices.find(voice => 
-                        voice.lang.includes('en') && voice.name.toLowerCase().includes('female')
-                    ) || voices.find(voice => voice.name.toLowerCase().includes('female'));
+                if (voices.length > 0) {
+                    resolve(voices);
                 } else {
-                    // Male voices
-                    selectedBrowserVoice = voices.find(voice => 
-                        voice.lang.includes('id') && voice.name.toLowerCase().includes('male')
-                    ) || voices.find(voice => 
-                        voice.lang.includes('en') && voice.name.toLowerCase().includes('male')
-                    ) || voices.find(voice => voice.name.toLowerCase().includes('male'));
+                    speechSynthesis.onvoiceschanged = () => {
+                        voices = speechSynthesis.getVoices();
+                        resolve(voices);
+                    };
                 }
+            });
+        }
 
-                if (selectedBrowserVoice) {
-                    utterance.voice = selectedBrowserVoice;
+        // Create audio recording from speech synthesis
+        async function createAudioFromSpeech(text, voiceId) {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    if (!('speechSynthesis' in window)) {
+                        reject(new Error('Browser tidak mendukung Text-to-Speech'));
+                        return;
+                    }
+
+                    // Get available voices
+                    const voices = await getBrowserVoices();
+                    
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    
+                    // Select voice based on our voice ID
+                    let selectedVoice = null;
+                    
+                    if (voiceId === 'Kore' || voiceId === 'Aoede') {
+                        // Female voices - try to find female voice
+                        selectedVoice = voices.find(v => v.name.toLowerCase().includes('female')) ||
+                                     voices.find(v => v.name.toLowerCase().includes('woman')) ||
+                                     voices.find(v => v.gender === 'female') ||
+                                     voices.find(v => v.lang.startsWith('en') && !v.name.toLowerCase().includes('male')) ||
+                                     voices[Math.floor(voices.length / 2)]; // fallback to middle voice
+                    } else {
+                        // Male voices - try to find male voice
+                        selectedVoice = voices.find(v => v.name.toLowerCase().includes('male')) ||
+                                     voices.find(v => v.name.toLowerCase().includes('man')) ||
+                                     voices.find(v => v.gender === 'male') ||
+                                     voices.find(v => v.lang.startsWith('en')) ||
+                                     voices[0]; // fallback to first voice
+                    }
+
+                    if (selectedVoice) {
+                        utterance.voice = selectedVoice;
+                    }
+
+                    // Apply settings
+                    const speed = parseFloat(document.getElementById('speedRange').value);
+                    const volumeRange = parseFloat(document.getElementById('volumeRange').value);
+                    const volume = Math.min(1, Math.max(0.1, (volumeRange + 50) / 100));
+                    
+                    utterance.rate = speed;
+                    utterance.volume = volume;
+                    utterance.pitch = 1;
+
+                    // Create audio context for recording
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const mediaStreamDestination = audioContext.createMediaStreamDestination();
+                    
+                    // Create media recorder
+                    const mediaRecorder = new MediaRecorder(mediaStreamDestination.stream);
+                    const audioChunks = [];
+
+                    mediaRecorder.ondataavailable = (event) => {
+                        if (event.data.size > 0) {
+                            audioChunks.push(event.data);
+                        }
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        resolve(audioBlob);
+                    };
+
+                    // Start recording
+                    mediaRecorder.start();
+
+                    utterance.onstart = () => {
+                        console.log('Speech started');
+                    };
+
+                    utterance.onend = () => {
+                        setTimeout(() => {
+                            mediaRecorder.stop();
+                            audioContext.close();
+                        }, 500); // Give a bit of buffer time
+                    };
+
+                    utterance.onerror = (event) => {
+                        mediaRecorder.stop();
+                        audioContext.close();
+                        reject(new Error('Speech synthesis error: ' + event.error));
+                    };
+
+                    // Start speech synthesis
+                    speechSynthesis.speak(utterance);
+
+                } catch (error) {
+                    reject(error);
                 }
-
-                // Apply settings
-                const speed = parseFloat(document.getElementById('speedRange').value);
-                const volume = Math.min(1, Math.max(0, parseFloat(document.getElementById('volumeRange').value) / 96 + 0.5));
-                
-                utterance.rate = speed;
-                utterance.volume = volume;
-                utterance.pitch = 1;
-
-                utterance.onend = () => {
-                    // Create a simple audio blob for download
-                    const audioBlob = new Blob([''], { type: 'audio/wav' });
-                    resolve(audioBlob);
-                };
-
-                utterance.onerror = (event) => {
-                    reject(new Error('Gagal membuat audio: ' + event.error));
-                };
-
-                // Speak the text
-                speechSynthesis.speak(utterance);
             });
         }
 
@@ -573,32 +628,32 @@
             showStatus('Sedang membuat audio...', 'info');
 
             try {
-                // Use Web Speech API directly for immediate playback
+                // Method 1: Direct speech synthesis for immediate playback
                 if (!('speechSynthesis' in window)) {
                     throw new Error('Browser tidak mendukung Text-to-Speech');
                 }
 
+                // Get available voices
+                const voices = await getBrowserVoices();
                 const utterance = new SpeechSynthesisUtterance(text);
                 
-                // Map our voice IDs to browser voices
-                const voices = speechSynthesis.getVoices();
+                // Select voice based on our voice ID
                 let selectedBrowserVoice = null;
-
-                // Try to find Indonesian or English voices
+                
                 if (selectedVoice.id === 'Kore' || selectedVoice.id === 'Aoede') {
                     // Female voices
-                    selectedBrowserVoice = voices.find(voice => 
-                        voice.lang.includes('id') && voice.name.toLowerCase().includes('female')
-                    ) || voices.find(voice => 
-                        voice.lang.includes('en') && voice.name.toLowerCase().includes('female')
-                    ) || voices.find(voice => voice.name.toLowerCase().includes('female'));
+                    selectedBrowserVoice = voices.find(v => v.name.toLowerCase().includes('female')) ||
+                                         voices.find(v => v.name.toLowerCase().includes('woman')) ||
+                                         voices.find(v => v.gender === 'female') ||
+                                         voices.find(v => v.lang.startsWith('en') && !v.name.toLowerCase().includes('male')) ||
+                                         voices[Math.floor(voices.length / 2)];
                 } else {
                     // Male voices
-                    selectedBrowserVoice = voices.find(voice => 
-                        voice.lang.includes('id') && voice.name.toLowerCase().includes('male')
-                    ) || voices.find(voice => 
-                        voice.lang.includes('en') && voice.name.toLowerCase().includes('male')
-                    ) || voices.find(voice => voice.name.toLowerCase().includes('male'));
+                    selectedBrowserVoice = voices.find(v => v.name.toLowerCase().includes('male')) ||
+                                         voices.find(v => v.name.toLowerCase().includes('man')) ||
+                                         voices.find(v => v.gender === 'male') ||
+                                         voices.find(v => v.lang.startsWith('en')) ||
+                                         voices[0];
                 }
 
                 if (selectedBrowserVoice) {
@@ -607,18 +662,19 @@
 
                 // Apply settings
                 const speed = parseFloat(document.getElementById('speedRange').value);
-                const volume = Math.min(1, Math.max(0, parseFloat(document.getElementById('volumeRange').value) / 96 + 0.5));
+                const volumeRange = parseFloat(document.getElementById('volumeRange').value);
+                const volume = Math.min(1, Math.max(0.1, (volumeRange + 50) / 100));
                 
                 utterance.rate = speed;
                 utterance.volume = volume;
                 utterance.pitch = 1;
 
                 utterance.onstart = () => {
-                    showStatus('Audio sedang diputar...', 'info');
+                    showStatus(`Audio diputar dengan suara: ${selectedBrowserVoice ? selectedBrowserVoice.name : 'Default'}`, 'info');
                 };
 
                 utterance.onend = () => {
-                    showStatus('Audio selesai diputar! Gunakan kontrol browser untuk mengulang.', 'success');
+                    showStatus('Audio selesai diputar! Klik tombol lagi untuk mengulang.', 'success');
                     // Reset button state
                     generateBtn.classList.remove('loading');
                     generateIcon.textContent = '🎵';
@@ -626,14 +682,43 @@
                 };
 
                 utterance.onerror = (event) => {
+                    // Reset button state
+                    generateBtn.classList.remove('loading');
+                    generateIcon.textContent = '🎵';
+                    generateText.textContent = 'Buat Suara';
                     throw new Error('Gagal memutar audio: ' + event.error);
                 };
 
-                // Speak the text
-                speechSynthesis.speak(utterance);
+                // Method 2: Try to create downloadable audio (experimental)
+                try {
+                    const audioBlob = await createAudioFromSpeech(text, selectedVoice.id);
+                    if (audioBlob && audioBlob.size > 0) {
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        audioPlayer.src = audioUrl;
+                        audioPlayer.classList.remove('hidden');
+                        
+                        // Add download functionality
+                        audioPlayer.onloadeddata = () => {
+                            const downloadBtn = document.getElementById('downloadBtn');
+                            if (!downloadBtn) {
+                                const btn = document.createElement('a');
+                                btn.id = 'downloadBtn';
+                                btn.href = audioUrl;
+                                btn.download = 'speech-audio.wav';
+                                btn.className = 'w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-center block mt-2';
+                                btn.textContent = '📥 Download Audio';
+                                audioPlayer.parentNode.insertBefore(btn, audioPlayer.nextSibling);
+                            } else {
+                                downloadBtn.href = audioUrl;
+                            }
+                        };
+                    }
+                } catch (recordError) {
+                    console.log('Audio recording not supported, using direct speech only');
+                }
 
-                // Hide audio player since we're using direct speech
-                audioPlayer.classList.add('hidden');
+                // Start speech synthesis
+                speechSynthesis.speak(utterance);
 
             } catch (error) {
                 console.error('Error generating speech:', error);
@@ -665,5 +750,5 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', init);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'980641bea1a925fd',t:'MTc1ODA4NzUwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'980653398488cdde',t:'MTc1ODA4ODIxNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
