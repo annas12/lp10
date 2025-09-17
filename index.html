@@ -3,959 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text to Speech - Advanced AI Studio</title>
+    <title>Text to Voice Indonesia</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .voice-card {
-            transition: all 0.3s ease;
-        }
-        .voice-card:hover {
-            transform: translateY(-2px);
-        }
-        .voice-card.selected {
-            border-color: #3b82f6;
-            background-color: #eff6ff;
-        }
-        .pulse-animation {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        .loading {
-            opacity: 0.6;
-            pointer-events: none;
-        }
-        .preview-loading {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-        .waveform {
-            display: flex;
-            align-items: center;
-            height: 40px;
-            gap: 2px;
-        }
-        .waveform-bar {
-            width: 3px;
-            background: linear-gradient(to top, #3b82f6, #60a5fa);
-            border-radius: 2px;
-            animation: wave 1.5s ease-in-out infinite;
-        }
-        .waveform-bar:nth-child(2) { animation-delay: 0.1s; }
-        .waveform-bar:nth-child(3) { animation-delay: 0.2s; }
-        .waveform-bar:nth-child(4) { animation-delay: 0.3s; }
-        .waveform-bar:nth-child(5) { animation-delay: 0.4s; }
-        @keyframes wave {
-            0%, 100% { height: 10px; }
-            50% { height: 30px; }
-        }
-        .audio-visualizer {
-            background: linear-gradient(45deg, #f0f9ff, #e0f2fe);
-            border-radius: 12px;
-            padding: 16px;
-            border: 2px solid #bae6fd;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-purple-100 min-h-screen">
-    <div class="container mx-auto px-4 py-6 max-w-md">
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-2xl">
         <!-- Header -->
-        <div class="text-center mb-6">
-            <h1 class="text-2xl font-bold text-gray-800 mb-2">🎤 Text to Speech</h1>
-            <p class="text-gray-600 text-sm">Powered by Google AI Studio</p>
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">🎤 Text to Voice</h1>
+            <p class="text-gray-600">Ubah teks menjadi suara dengan teknologi AI</p>
         </div>
 
-        <!-- AI Text Generation -->
-        <div class="bg-white rounded-xl shadow-lg p-4 mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">🤖 Generator Teks AI</label>
-            <div class="flex space-x-2 mb-3">
-                <input 
-                    type="text" 
-                    id="aiPromptInput" 
-                    placeholder="Deskripsikan teks yang ingin dibuat..."
-                    class="flex-1 p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                <button 
-                    id="generateTextBtn"
-                    class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1"
-                >
-                    <span id="generateTextIcon">✨</span>
-                    <span>Buat</span>
-                </button>
+        <!-- Main Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-8">
+            <!-- Text Input -->
+            <div class="mb-6">
+                <label for="textInput" class="block text-sm font-semibold text-gray-700 mb-3">
+                    📝 Masukkan Teks
+                </label>
+                <textarea 
+                    id="textInput" 
+                    placeholder="Ketik teks yang ingin diubah menjadi suara..."
+                    class="w-full h-32 p-4 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none resize-none text-gray-700"
+                ></textarea>
+                <div class="text-right mt-2">
+                    <span id="charCount" class="text-sm text-gray-500">0/500 karakter</span>
+                </div>
             </div>
-            <div class="flex flex-wrap gap-1 mb-2">
-                <button class="quick-prompt text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded transition-colors" data-prompt="Buatkan perkenalan profesional untuk presentasi perusahaan">📊 Intro Perusahaan</button>
-                <button class="quick-prompt text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded transition-colors" data-prompt="Buatkan pidato motivasi tentang mencapai tujuan">🎯 Motivasi</button>
-                <button class="quick-prompt text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded transition-colors" data-prompt="Buatkan sapaan ramah untuk customer service">🤝 Customer Service</button>
-                <button class="quick-prompt text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded transition-colors" data-prompt="Buatkan pengumuman produk untuk aplikasi baru">📱 Peluncuran Produk</button>
-            </div>
-        </div>
 
-        <!-- Text Input -->
-        <div class="bg-white rounded-xl shadow-lg p-4 mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Teks untuk Speech</label>
-            <textarea 
-                id="textInput" 
-                placeholder="Ketik teks untuk diubah menjadi suara atau gunakan generator AI di atas..."
-                class="w-full h-24 p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >Halo, ini adalah demo text to speech menggunakan Google AI Studio. Kualitas suaranya sangat bagus dan natural.</textarea>
-        </div>
-
-        <!-- Voice Selection -->
-        <div class="bg-white rounded-xl shadow-lg p-4 mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-3">Pilih Suara</label>
-            
-            <!-- Selected Voice Display -->
-            <div id="selectedVoiceDisplay" class="hidden mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <div id="selectedVoiceIcon" class="text-2xl">🎭</div>
-                        <div>
-                            <div id="selectedVoiceName" class="font-medium text-sm text-gray-800">Pilih Suara</div>
-                            <div id="selectedVoiceCategory" class="text-xs text-gray-500">Google AI Voice</div>
+            <!-- Voice Selection -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">
+                    🎭 Pilih Suara
+                </label>
+                <div class="grid grid-cols-2 gap-4">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="voice" value="male" class="sr-only" checked>
+                        <div class="voice-option border-2 border-blue-500 bg-blue-50 rounded-xl p-4 text-center transition-all">
+                            <div class="text-2xl mb-2">👨</div>
+                            <div class="font-medium text-gray-800">Pria Indonesia</div>
+                            <div class="text-sm text-gray-600">Suara maskulin</div>
                         </div>
-                    </div>
-                    <div class="flex space-x-2">
-                        <button id="previewSelectedBtn" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                            ▶️
-                        </button>
-                        <button id="changeVoiceBtn" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                            Ganti
-                        </button>
-                    </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="voice" value="female" class="sr-only">
+                        <div class="voice-option border-2 border-gray-200 bg-gray-50 rounded-xl p-4 text-center transition-all">
+                            <div class="text-2xl mb-2">👩</div>
+                            <div class="font-medium text-gray-800">Wanita Indonesia</div>
+                            <div class="text-sm text-gray-600">Suara feminin</div>
+                        </div>
+                    </label>
                 </div>
             </div>
 
-            <!-- Voice Grid -->
-            <div id="voiceGrid" class="grid grid-cols-2 gap-2">
-                <!-- Voices will be populated here -->
-            </div>
-        </div>
-
-        <!-- Voice Settings -->
-        <div class="bg-white rounded-xl shadow-lg p-4 mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-3">Pengaturan Suara</label>
-            
-            <!-- Speed -->
-            <div class="mb-3">
-                <label class="block text-xs text-gray-600 mb-1">Kecepatan</label>
-                <div class="flex items-center space-x-3">
-                    <span class="text-xs text-gray-500">Lambat</span>
-                    <input 
-                        type="range" 
-                        id="speedRange" 
-                        min="0.25" 
-                        max="4" 
-                        step="0.25" 
-                        value="1"
-                        class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    >
-                    <span class="text-xs text-gray-500">Cepat</span>
-                </div>
-                <div class="text-center mt-1">
-                    <span id="speedValue" class="text-xs text-blue-600 font-medium">1x</span>
-                </div>
-            </div>
-
-            <!-- Volume -->
-            <div>
-                <label class="block text-xs text-gray-600 mb-1">Volume</label>
-                <div class="flex items-center space-x-3">
-                    <span class="text-xs text-gray-500">Pelan</span>
-                    <input 
-                        type="range" 
-                        id="volumeRange" 
-                        min="0" 
-                        max="100" 
-                        step="1" 
-                        value="80"
-                        class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    >
-                    <span class="text-xs text-gray-500">Keras</span>
-                </div>
-                <div class="text-center mt-1">
-                    <span id="volumeValue" class="text-xs text-blue-600 font-medium">80%</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Control Buttons -->
-        <div class="space-y-3 mb-4">
+            <!-- Generate Button -->
             <button 
-                id="generateBtn"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
+                id="generateBtn" 
+                class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
             >
-                <span id="generateIcon">🎵</span>
-                <span id="generateText">Buat Suara</span>
+                <span id="btnText">🎵 Generate Suara</span>
+                <div id="loadingSpinner" class="hidden inline-block ml-2">
+                    <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                </div>
             </button>
-            
-            <!-- Audio Result Section -->
-            <div id="audioResultSection" class="hidden bg-white rounded-xl shadow-lg p-4 border border-gray-200">
-                <label class="block text-sm font-medium text-gray-700 mb-3">🎧 Hasil Audio</label>
-                
-                <!-- Audio Player -->
-                <audio id="audioPlayer" controls class="w-full mb-3">
-                    Browser Anda tidak mendukung audio player.
+
+            <!-- Audio Player -->
+            <div id="audioSection" class="hidden mt-8 p-6 bg-gray-50 rounded-xl">
+                <div class="text-center mb-4">
+                    <h3 class="font-semibold text-gray-800 mb-2">🎧 Audio Hasil</h3>
+                </div>
+                <audio id="audioPlayer" controls class="w-full mb-4 rounded-lg">
+                    Your browser does not support the audio element.
                 </audio>
-                
-                <!-- Download Button -->
-                <button 
-                    id="downloadBtn"
-                    class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
-                >
-                    <span>📥</span>
-                    <span>Download Audio MP3</span>
-                </button>
+                <div class="flex gap-3">
+                    <button 
+                        id="playBtn" 
+                        class="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+                    >
+                        ▶️ Play
+                    </button>
+                    <button 
+                        id="downloadBtn" 
+                        class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-colors"
+                    >
+                        💾 Download MP3
+                    </button>
+                </div>
             </div>
-        </div>
 
-        <!-- Status -->
-        <div id="status" class="text-center text-sm text-gray-500 hidden"></div>
-
-        <!-- Usage Info -->
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
-            <p class="text-xs text-blue-800">
-                <strong>Google AI Studio:</strong> Gratis dengan quota besar. Speech generation menggunakan Gemini API dengan kualitas suara yang excellent.
-            </p>
+            <!-- Status Notice -->
+            <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div class="flex items-start">
+                    <div class="text-green-600 mr-2">✅</div>
+                    <div class="text-sm text-green-800">
+                        <strong>Ready:</strong> Aplikasi terhubung dengan Google AI Studio API untuk menghasilkan suara berkualitas tinggi dalam bahasa Indonesia.
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        let selectedVoice = null;
-        let availableVoices = [];
-        let apiKey = '';
+        // Elements
+        const textInput = document.getElementById('textInput');
+        const charCount = document.getElementById('charCount');
+        const generateBtn = document.getElementById('generateBtn');
+        const btnText = document.getElementById('btnText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const audioSection = document.getElementById('audioSection');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playBtn = document.getElementById('playBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const voiceOptions = document.querySelectorAll('input[name="voice"]');
+
         let currentAudioBlob = null;
 
-        // Indonesian-friendly voices with pitch settings
-        const googleVoices = [
-            { id: 'Andi', name: 'Andi', gender: 'Male', description: 'Suara pria Indonesia yang jelas', pitch: 0.8 },
-            { id: 'Sari', name: 'Sari', gender: 'Female', description: 'Suara wanita Indonesia yang lembut', pitch: 1.2 },
-            { id: 'Budi', name: 'Budi', gender: 'Male', description: 'Suara pria dewasa yang tegas', pitch: 0.7 },
-            { id: 'Dewi', name: 'Dewi', gender: 'Female', description: 'Suara wanita profesional', pitch: 1.1 },
-            { id: 'Rudi', name: 'Rudi', gender: 'Male', description: 'Suara pria muda yang energik', pitch: 0.9 },
-            { id: 'Maya', name: 'Maya', gender: 'Female', description: 'Suara wanita ramah dan hangat', pitch: 1.3 }
-        ];
-
-        // Initialize the app
-        async function init() {
-            setupEventListeners();
-            loadVoices();
-            loadSavedApiKey();
-        }
-
-        // Load saved API key
-        function loadSavedApiKey() {
-            apiKey = 'AIzaSyARvi8ZutwlLRay6S8zGRoqQt-wI1-mVUg';
-        }
-
-        // Load voices
-        function loadVoices() {
-            availableVoices = googleVoices;
-            populateVoiceGrid();
-        }
-
-        // Create voice selection grid
-        function populateVoiceGrid() {
-            const grid = document.getElementById('voiceGrid');
-            grid.innerHTML = '';
+        // Character counter
+        textInput.addEventListener('input', function() {
+            const length = this.value.length;
+            charCount.textContent = `${length}/500 karakter`;
             
-            availableVoices.forEach((voice, index) => {
-                const container = document.createElement('div');
-                container.className = 'voice-button bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-300 rounded-lg p-3 transition-all duration-200';
-                container.dataset.voiceId = voice.id;
-                
-                const icon = voice.gender === 'Female' ? '👩' : '👨';
-                
-                container.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2 flex-1 min-w-0 cursor-pointer select-voice-area">
-                            <div class="text-lg">${icon}</div>
-                            <div class="flex-1 min-w-0">
-                                <div class="font-medium text-xs text-gray-800 truncate">${voice.name}</div>
-                                <div class="text-xs text-gray-500 truncate">${voice.description}</div>
-                            </div>
-                        </div>
-                        <button class="preview-btn ml-2 text-blue-600 hover:text-blue-700 text-xs font-medium px-2 py-1 rounded border border-blue-200 hover:border-blue-300 transition-colors" data-voice-id="${voice.id}" data-voice-name="${voice.name}">
-                            ▶️
-                        </button>
-                    </div>
-                `;
-                
-                // Add click event for voice selection
-                const selectArea = container.querySelector('.select-voice-area');
-                selectArea.addEventListener('click', () => selectVoice(voice));
-                
-                // Add click event for preview
-                const previewBtn = container.querySelector('.preview-btn');
-                previewBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    previewVoice(voice, previewBtn);
+            if (length > 500) {
+                this.value = this.value.substring(0, 500);
+                charCount.textContent = '500/500 karakter';
+            }
+        });
+
+        // Voice selection styling
+        voiceOptions.forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.querySelectorAll('.voice-option').forEach(option => {
+                    option.classList.remove('border-blue-500', 'bg-blue-50');
+                    option.classList.add('border-gray-200', 'bg-gray-50');
                 });
                 
-                grid.appendChild(container);
-            });
-
-            // Select first voice by default
-            if (availableVoices.length > 0) {
-                selectVoice(availableVoices[0]);
-            }
-        }
-
-        // Preview voice function
-        async function previewVoice(voice, buttonElement) {
-            const previewText = `Halo, saya ${voice.name}. Ini adalah contoh suara saya.`;
-            
-            // Show loading state
-            const originalText = buttonElement.textContent;
-            buttonElement.textContent = '⏳';
-            buttonElement.classList.add('preview-loading');
-            
-            try {
-                if (!('speechSynthesis' in window)) {
-                    throw new Error('Browser tidak mendukung Text-to-Speech');
-                }
-
-                const utterance = new SpeechSynthesisUtterance(previewText);
-                
-                // Apply voice settings
-                utterance.rate = 1;
-                utterance.volume = 0.8;
-                utterance.pitch = voice.pitch || 1;
-
-                utterance.onend = () => {
-                    buttonElement.textContent = originalText;
-                    buttonElement.classList.remove('preview-loading');
-                };
-
-                utterance.onerror = (event) => {
-                    buttonElement.textContent = originalText;
-                    buttonElement.classList.remove('preview-loading');
-                    console.error('Preview error:', event.error);
-                };
-
-                // Speak the preview
-                speechSynthesis.speak(utterance);
-                showStatus(`Preview: ${voice.name}`, 'info');
-
-            } catch (error) {
-                console.error('Error previewing voice:', error);
-                showStatus('Gagal preview suara: ' + error.message, 'error');
-                buttonElement.textContent = originalText;
-                buttonElement.classList.remove('preview-loading');
-            }
-        }
-
-        // Generate text using Google AI Studio API
-        async function generateTextAPI(prompt) {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-goog-api-key': apiKey
-                },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: prompt
-                        }]
-                    }]
-                })
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error?.message || `HTTP ${response.status}`);
-            }
-
-            const data = await response.json();
-            
-            if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
-                const textPart = data.candidates[0].content.parts.find(part => part.text);
-                if (textPart) {
-                    return textPart.text;
-                }
-            }
-            
-            throw new Error('No text data in response');
-        }
-
-        // Select a voice
-        function selectVoice(voice) {
-            selectedVoice = voice;
-            
-            const icon = voice.gender === 'Female' ? '👩' : '👨';
-            
-            document.getElementById('selectedVoiceIcon').textContent = icon;
-            document.getElementById('selectedVoiceName').textContent = voice.name;
-            document.getElementById('selectedVoiceCategory').textContent = voice.description;
-            
-            // Show selected voice display and hide grid
-            document.getElementById('selectedVoiceDisplay').classList.remove('hidden');
-            document.getElementById('voiceGrid').classList.add('hidden');
-        }
-
-        // Show voice grid again
-        function showVoiceGrid() {
-            document.getElementById('selectedVoiceDisplay').classList.add('hidden');
-            document.getElementById('voiceGrid').classList.remove('hidden');
-        }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            const speedRange = document.getElementById('speedRange');
-            const speedValue = document.getElementById('speedValue');
-            const volumeRange = document.getElementById('volumeRange');
-            const volumeValue = document.getElementById('volumeValue');
-            const generateBtn = document.getElementById('generateBtn');
-            const changeVoiceBtn = document.getElementById('changeVoiceBtn');
-            const previewSelectedBtn = document.getElementById('previewSelectedBtn');
-            const generateTextBtn = document.getElementById('generateTextBtn');
-
-            // Speed control
-            speedRange.addEventListener('input', (e) => {
-                speedValue.textContent = parseFloat(e.target.value).toFixed(2) + 'x';
-            });
-
-            // Volume control
-            volumeRange.addEventListener('input', (e) => {
-                volumeValue.textContent = e.target.value + '%';
-            });
-
-            // Generate button
-            generateBtn.addEventListener('click', generateSpeech);
-
-            // Change voice button
-            changeVoiceBtn.addEventListener('click', showVoiceGrid);
-
-            // Preview selected voice button
-            previewSelectedBtn.addEventListener('click', () => {
-                if (selectedVoice) {
-                    previewVoice(selectedVoice, previewSelectedBtn);
+                if (this.checked) {
+                    const option = this.nextElementSibling;
+                    option.classList.remove('border-gray-200', 'bg-gray-50');
+                    option.classList.add('border-blue-500', 'bg-blue-50');
                 }
             });
+        });
 
-            // Generate text button
-            generateTextBtn.addEventListener('click', generateText);
-
-            // Enter key on AI prompt input
-            document.getElementById('aiPromptInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    generateText();
-                }
-            });
-
-            // Quick prompt buttons
-            document.querySelectorAll('.quick-prompt').forEach(button => {
-                button.addEventListener('click', () => {
-                    const prompt = button.dataset.prompt;
-                    document.getElementById('aiPromptInput').value = prompt;
-                });
-            });
-        }
-
-        // Generate text using AI
-        async function generateText() {
-            const aiPromptInput = document.getElementById('aiPromptInput');
-            const textInput = document.getElementById('textInput');
-            const generateTextBtn = document.getElementById('generateTextBtn');
-            const generateTextIcon = document.getElementById('generateTextIcon');
-
-            const prompt = aiPromptInput.value.trim();
-            if (!prompt) {
-                showStatus('Masukkan deskripsi teks yang ingin dibuat', 'error');
-                return;
-            }
-
-            if (!apiKey) {
-                showStatus('Masukkan API key terlebih dahulu', 'error');
-                return;
-            }
-
-            // Show loading state
-            generateTextBtn.classList.add('loading');
-            generateTextIcon.textContent = '⏳';
-            showStatus('AI sedang membuat teks...', 'info');
-
-            try {
-                const generatedText = await generateTextAPI(prompt);
-                textInput.value = generatedText;
-                showStatus('Teks berhasil dibuat! Sekarang bisa di-convert ke speech.', 'success');
-
-            } catch (error) {
-                console.error('Error generating text:', error);
-                showStatus('Gagal membuat teks: ' + error.message, 'error');
-            } finally {
-                // Reset button state
-                generateTextBtn.classList.remove('loading');
-                generateTextIcon.textContent = '✨';
-            }
-        }
-
-        // Generate speech with advanced methods
-        async function generateSpeech() {
-            const textInput = document.getElementById('textInput');
-            const generateBtn = document.getElementById('generateBtn');
-            const generateIcon = document.getElementById('generateIcon');
-            const generateText = document.getElementById('generateText');
-            const audioPlayer = document.getElementById('audioPlayer');
-            const audioResultSection = document.getElementById('audioResultSection');
-            const downloadBtn = document.getElementById('downloadBtn');
-
+        // Generate speech using Google AI Studio API
+        generateBtn.addEventListener('click', async function() {
             const text = textInput.value.trim();
+            
             if (!text) {
-                showStatus('Silakan masukkan teks terlebih dahulu', 'error');
+                alert('Silakan masukkan teks terlebih dahulu!');
                 return;
             }
 
-            if (!selectedVoice) {
-                showStatus('Silakan pilih suara terlebih dahulu', 'error');
-                return;
-            }
-
-            // Show loading state
-            generateBtn.classList.add('loading');
-            generateIcon.textContent = '⏳';
-            generateText.textContent = 'Membuat Audio...';
-            showStatus('🎵 Sedang membuat audio berkualitas tinggi...', 'info');
+            // Show loading
+            btnText.textContent = 'Generating...';
+            loadingSpinner.classList.remove('hidden');
+            generateBtn.disabled = true;
 
             try {
-                // Use advanced audio generation
-                const audioBlob = await generateAdvancedAudio(text, selectedVoice);
+                const selectedVoice = document.querySelector('input[name="voice"]:checked').value;
                 
-                if (audioBlob && audioBlob.size > 0) {
-                    currentAudioBlob = audioBlob;
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    
-                    // Set up audio player
-                    audioPlayer.src = audioUrl;
-                    audioPlayer.load();
-                    
-                    // Show audio result section with waveform
-                    audioResultSection.classList.remove('hidden');
-                    
-                    // Add waveform visualization
-                    addWaveformVisualization();
-                    
-                    // Set up download button with proper file extension
-                    downloadBtn.onclick = () => {
-                        const a = document.createElement('a');
-                        a.href = audioUrl;
-                        
-                        let extension = '.mp3';
-                        if (audioBlob.type.includes('webm')) {
-                            extension = '.webm';
-                        } else if (audioBlob.type.includes('mp4')) {
-                            extension = '.m4a';
-                        }
-                        
-                        a.download = `speech-${selectedVoice.name}-${Date.now()}${extension}`;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        
-                        showStatus('✅ Audio berhasil didownload!', 'success');
-                    };
-                    
-                    // Add audio event listeners
-                    audioPlayer.onplay = () => {
-                        showStatus('🎵 Memutar audio...', 'info');
-                    };
-                    
-                    audioPlayer.onended = () => {
-                        showStatus('✅ Audio selesai diputar', 'success');
-                    };
-                    
-                    showStatus('🎉 Audio berhasil dibuat! Kualitas tinggi siap diputar dan didownload.', 'success');
-                    
-                    // Auto-play preview (optional)
-                    setTimeout(() => {
-                        if (audioPlayer.readyState >= 2) {
-                            audioPlayer.play().catch(e => {
-                                console.log('Auto-play prevented by browser');
-                            });
-                        }
-                    }, 500);
-                    
-                } else {
-                    throw new Error('Gagal membuat file audio - ukuran file kosong');
-                }
-
-            } catch (error) {
-                console.error('Error generating speech:', error);
-                showStatus('❌ Gagal membuat audio: ' + error.message, 'error');
-                
-                // Try fallback method
-                try {
-                    showStatus('🔄 Mencoba metode alternatif...', 'info');
-                    const fallbackAudio = await generateFallbackAudio(text, selectedVoice);
-                    
-                    if (fallbackAudio && fallbackAudio.size > 0) {
-                        currentAudioBlob = fallbackAudio;
-                        const audioUrl = URL.createObjectURL(fallbackAudio);
-                        audioPlayer.src = audioUrl;
-                        audioPlayer.load();
-                        audioResultSection.classList.remove('hidden');
-                        
-                        downloadBtn.onclick = () => {
-                            const a = document.createElement('a');
-                            a.href = audioUrl;
-                            a.download = `speech-${selectedVoice.name}-${Date.now()}.wav`;
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                        };
-                        
-                        showStatus('✅ Audio berhasil dibuat dengan metode alternatif!', 'success');
-                    } else {
-                        throw new Error('Semua metode gagal');
-                    }
-                } catch (fallbackError) {
-                    showStatus('❌ Semua metode audio generation gagal. Coba refresh halaman.', 'error');
-                }
-            } finally {
-                // Reset button state
-                generateBtn.classList.remove('loading');
-                generateIcon.textContent = '🎵';
-                generateText.textContent = 'Buat Suara';
-            }
-        }
-
-        // Fallback audio generation method
-        async function generateFallbackAudio(text, voiceConfig) {
-            return new Promise((resolve, reject) => {
-                try {
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.rate = parseFloat(document.getElementById('speedRange').value);
-                    utterance.volume = parseFloat(document.getElementById('volumeRange').value) / 100;
-                    utterance.pitch = voiceConfig.pitch || 1;
-                    
-                    // Simple audio context recording
-                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    const dest = audioContext.createMediaStreamDestination();
-                    const mediaRecorder = new MediaRecorder(dest.stream);
-                    const chunks = [];
-                    
-                    mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
-                    mediaRecorder.onstop = () => {
-                        const blob = new Blob(chunks, { type: 'audio/wav' });
-                        audioContext.close();
-                        resolve(blob);
-                    };
-                    
-                    utterance.onstart = () => mediaRecorder.start();
-                    utterance.onend = () => setTimeout(() => mediaRecorder.stop(), 500);
-                    utterance.onerror = () => {
-                        mediaRecorder.stop();
-                        audioContext.close();
-                        reject(new Error('Fallback method failed'));
-                    };
-                    
-                    speechSynthesis.speak(utterance);
-                } catch (error) {
-                    reject(error);
-                }
-            });
-        }
-
-        // Add waveform visualization to audio result
-        function addWaveformVisualization() {
-            const audioResultSection = document.getElementById('audioResultSection');
-            
-            // Remove existing waveform
-            const existingWaveform = audioResultSection.querySelector('.waveform');
-            if (existingWaveform) {
-                existingWaveform.remove();
-            }
-            
-            // Create new waveform
-            const waveformDiv = document.createElement('div');
-            waveformDiv.className = 'waveform justify-center mb-3';
-            waveformDiv.id = 'waveformContainer';
-            waveformDiv.style.display = 'none';
-            
-            for (let i = 0; i < 20; i++) {
-                const bar = document.createElement('div');
-                bar.className = 'waveform-bar';
-                bar.style.height = Math.random() * 20 + 10 + 'px';
-                bar.style.animationDelay = (i * 0.1) + 's';
-                waveformDiv.appendChild(bar);
-            }
-            
-            // Insert before audio player
-            const audioPlayer = audioResultSection.querySelector('#audioPlayer');
-            audioResultSection.insertBefore(waveformDiv, audioPlayer);
-        }
-
-        // Advanced audio generation using Web Audio API
-        async function generateAdvancedAudio(text, voiceConfig) {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    // Method 1: Try Google Cloud TTS API first
-                    try {
-                        const cloudAudio = await generateCloudTTS(text, voiceConfig);
-                        if (cloudAudio) {
-                            resolve(cloudAudio);
-                            return;
-                        }
-                    } catch (e) {
-                        console.log('Cloud TTS not available, using browser synthesis');
-                    }
-
-                    // Method 2: Enhanced browser synthesis with recording
-                    const browserAudio = await generateBrowserTTS(text, voiceConfig);
-                    resolve(browserAudio);
-
-                } catch (error) {
-                    reject(error);
-                }
-            });
-        }
-
-        // Google Cloud TTS API integration
-        async function generateCloudTTS(text, voiceConfig) {
-            try {
-                const response = await fetch('https://texttospeech.googleapis.com/v1/text:synthesize', {
+                const response = await fetch('https://text-to-speech-api.annasmashuri97.workers.dev/api/text-to-speech', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-goog-api-key': apiKey
                     },
                     body: JSON.stringify({
-                        input: { text: text },
-                        voice: {
-                            languageCode: 'id-ID',
-                            name: voiceConfig.gender === 'Female' ? 'id-ID-Standard-A' : 'id-ID-Standard-B',
-                            ssmlGender: voiceConfig.gender.toUpperCase()
-                        },
-                        audioConfig: {
-                            audioEncoding: 'MP3',
-                            speakingRate: parseFloat(document.getElementById('speedRange').value),
-                            pitch: (voiceConfig.pitch - 1) * 20,
-                            volumeGainDb: parseFloat(document.getElementById('volumeRange').value) / 10 - 5
-                        }
+                        text: text,
+                        voice: selectedVoice
                     })
                 });
 
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.audioContent) {
-                        // Convert base64 to blob
-                        const audioData = atob(data.audioContent);
-                        const audioArray = new Uint8Array(audioData.length);
-                        for (let i = 0; i < audioData.length; i++) {
-                            audioArray[i] = audioData.charCodeAt(i);
-                        }
-                        return new Blob([audioArray], { type: 'audio/mp3' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Convert base64 to blob
+                    const audioData = atob(data.audioContent);
+                    const audioArray = new Uint8Array(audioData.length);
+                    for (let i = 0; i < audioData.length; i++) {
+                        audioArray[i] = audioData.charCodeAt(i);
                     }
+                    
+                    currentAudioBlob = new Blob([audioArray], { type: 'audio/mp3' });
+                    const audioUrl = URL.createObjectURL(currentAudioBlob);
+                    
+                    audioPlayer.src = audioUrl;
+                    audioSection.classList.remove('hidden');
+                } else {
+                    throw new Error(data.error || 'Failed to generate speech');
                 }
             } catch (error) {
-                console.log('Cloud TTS error:', error);
+                console.error('Error:', error);
+                alert('Terjadi kesalahan: ' + error.message);
+            } finally {
+                btnText.textContent = '🎵 Generate Suara';
+                loadingSpinner.classList.add('hidden');
+                generateBtn.disabled = false;
             }
-            return null;
-        }
+        });
 
-        // Enhanced browser TTS with better recording
-        async function generateBrowserTTS(text, voiceConfig) {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    if (!('speechSynthesis' in window)) {
-                        throw new Error('Browser tidak mendukung Text-to-Speech');
-                    }
+        // Play button
+        playBtn.addEventListener('click', function() {
+            audioPlayer.play();
+        });
 
-                    // Wait for voices to load
-                    const voices = await getBrowserVoices();
-                    
-                    // Create audio context with higher sample rate
-                    const audioContext = new (window.AudioContext || window.webkitAudioContext)({
-                        sampleRate: 48000
-                    });
-                    
-                    // Create destination for recording
-                    const dest = audioContext.createMediaStreamDestination();
-                    
-                    // Create gain node for volume control
-                    const gainNode = audioContext.createGain();
-                    gainNode.connect(dest);
-                    
-                    // Create media recorder with best available format
-                    let mediaRecorder;
-                    const mimeTypes = [
-                        'audio/webm;codecs=opus',
-                        'audio/mp4;codecs=mp4a.40.2',
-                        'audio/webm',
-                        'audio/mp4'
-                    ];
-                    
-                    for (const mimeType of mimeTypes) {
-                        if (MediaRecorder.isTypeSupported(mimeType)) {
-                            mediaRecorder = new MediaRecorder(dest.stream, {
-                                mimeType: mimeType,
-                                audioBitsPerSecond: 128000
-                            });
-                            break;
-                        }
-                    }
-                    
-                    if (!mediaRecorder) {
-                        throw new Error('MediaRecorder tidak didukung di browser ini');
-                    }
-                    
-                    const audioChunks = [];
-                    let recordingStarted = false;
-                    
-                    mediaRecorder.ondataavailable = (event) => {
-                        if (event.data.size > 0) {
-                            audioChunks.push(event.data);
-                        }
-                    };
-                    
-                    mediaRecorder.onstop = () => {
-                        let mimeType = 'audio/mp3';
-                        if (mediaRecorder.mimeType.includes('webm')) {
-                            mimeType = 'audio/webm';
-                        } else if (mediaRecorder.mimeType.includes('mp4')) {
-                            mimeType = 'audio/mp4';
-                        }
-                        
-                        const audioBlob = new Blob(audioChunks, { type: mimeType });
-                        audioContext.close();
-                        resolve(audioBlob);
-                    };
-                    
-                    // Create utterance
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    
-                    // Select best voice
-                    let selectedVoice = null;
-                    if (voiceConfig.gender === 'Female') {
-                        selectedVoice = voices.find(v => 
-                            (v.lang && v.lang.startsWith('id')) && 
-                            (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('wanita'))
-                        ) || voices.find(v => v.name.toLowerCase().includes('female')) ||
-                        voices.find(v => v.gender === 'female') ||
-                        voices[Math.floor(voices.length * 0.6)];
-                    } else {
-                        selectedVoice = voices.find(v => 
-                            (v.lang && v.lang.startsWith('id')) && 
-                            (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('pria'))
-                        ) || voices.find(v => v.name.toLowerCase().includes('male')) ||
-                        voices.find(v => v.gender === 'male') ||
-                        voices[0];
-                    }
-                    
-                    if (selectedVoice) {
-                        utterance.voice = selectedVoice;
-                    }
-                    
-                    // Apply settings
-                    utterance.rate = parseFloat(document.getElementById('speedRange').value);
-                    utterance.volume = parseFloat(document.getElementById('volumeRange').value) / 100;
-                    utterance.pitch = voiceConfig.pitch || 1;
-                    
-                    // Set up event handlers
-                    utterance.onstart = () => {
-                        if (!recordingStarted) {
-                            mediaRecorder.start(100); // Record in 100ms chunks
-                            recordingStarted = true;
-                        }
-                        showWaveform();
-                    };
-                    
-                    utterance.onend = () => {
-                        setTimeout(() => {
-                            if (mediaRecorder.state === 'recording') {
-                                mediaRecorder.stop();
-                            }
-                            hideWaveform();
-                        }, 1000);
-                    };
-                    
-                    utterance.onerror = (event) => {
-                        if (mediaRecorder.state === 'recording') {
-                            mediaRecorder.stop();
-                        }
-                        audioContext.close();
-                        hideWaveform();
-                        reject(new Error('Speech synthesis error: ' + event.error));
-                    };
-                    
-                    // Start synthesis
-                    speechSynthesis.cancel(); // Clear any previous speech
-                    speechSynthesis.speak(utterance);
-                    
-                } catch (error) {
-                    reject(error);
-                }
-            });
-        }
-
-        // Get browser voices with retry
-        function getBrowserVoices() {
-            return new Promise((resolve) => {
-                let voices = speechSynthesis.getVoices();
-                
-                if (voices.length > 0) {
-                    resolve(voices);
-                } else {
-                    let attempts = 0;
-                    const checkVoices = () => {
-                        voices = speechSynthesis.getVoices();
-                        if (voices.length > 0 || attempts > 10) {
-                            resolve(voices);
-                        } else {
-                            attempts++;
-                            setTimeout(checkVoices, 100);
-                        }
-                    };
-                    
-                    speechSynthesis.onvoiceschanged = checkVoices;
-                    checkVoices();
-                }
-            });
-        }
-
-        // Show waveform animation
-        function showWaveform() {
-            const audioResultSection = document.getElementById('audioResultSection');
-            const waveformContainer = document.getElementById('waveformContainer');
-            
-            if (waveformContainer) {
-                waveformContainer.style.display = 'flex';
+        // Download button
+        downloadBtn.addEventListener('click', function() {
+            if (currentAudioBlob) {
+                const url = URL.createObjectURL(currentAudioBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'text-to-speech.mp3';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } else {
+                alert('Tidak ada audio untuk didownload. Silakan generate suara terlebih dahulu.');
             }
-        }
-
-        // Hide waveform animation
-        function hideWaveform() {
-            const waveformContainer = document.getElementById('waveformContainer');
-            
-            if (waveformContainer) {
-                setTimeout(() => {
-                    waveformContainer.style.display = 'none';
-                }, 1000);
-            }
-        }
-
-        // Show status message
-        function showStatus(message, type = 'info') {
-            const status = document.getElementById('status');
-            status.className = `text-center text-sm ${
-                type === 'error' ? 'text-red-600' : 
-                type === 'success' ? 'text-green-600' : 
-                type === 'warning' ? 'text-yellow-600' : 
-                'text-blue-600'
-            }`;
-            status.textContent = message;
-            status.classList.remove('hidden');
-            
-            setTimeout(() => {
-                status.classList.add('hidden');
-            }, 5000);
-        }
-
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', init);
+        });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9806a1e33336fe8e',t:'MTc1ODA5MTQzOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9806bf59615a4496',t:'MTc1ODA5MjY0NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
