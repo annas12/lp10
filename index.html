@@ -41,10 +41,6 @@
             <p class="text-gray-600 text-sm">Powered by Google AI Studio</p>
         </div>
 
-
-
-
-
         <!-- AI Text Generation -->
         <div class="bg-white rounded-xl shadow-lg p-4 mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">🤖 Generator Teks AI</label>
@@ -146,15 +142,15 @@
                         type="range" 
                         id="volumeRange" 
                         min="0" 
-                        max="96" 
+                        max="100" 
                         step="1" 
-                        value="0"
+                        value="80"
                         class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                     >
                     <span class="text-xs text-gray-500">Keras</span>
                 </div>
                 <div class="text-center mt-1">
-                    <span id="volumeValue" class="text-xs text-blue-600 font-medium">0 dB</span>
+                    <span id="volumeValue" class="text-xs text-blue-600 font-medium">80%</span>
                 </div>
             </div>
         </div>
@@ -174,8 +170,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-3">🎧 Hasil Audio</label>
                 
                 <!-- Audio Player -->
-                <audio id="audioPlayer" controls class="w-full mb-3" controlsList="nodownload">
-                    <source id="audioSource" src="" type="audio/mpeg">
+                <audio id="audioPlayer" controls class="w-full mb-3">
                     Browser Anda tidak mendukung audio player.
                 </audio>
                 
@@ -185,11 +180,9 @@
                     class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
                 >
                     <span>📥</span>
-                    <span>Download Audio</span>
+                    <span>Download Audio MP3</span>
                 </button>
             </div>
-            
-            <audio id="previewPlayer" class="hidden"></audio>
         </div>
 
         <!-- Status -->
@@ -207,34 +200,28 @@
         let selectedVoice = null;
         let availableVoices = [];
         let apiKey = '';
+        let currentAudioBlob = null;
 
-        // Indonesian-friendly voices
+        // Indonesian-friendly voices with pitch settings
         const googleVoices = [
-            { id: 'Andi', name: 'Andi', gender: 'Male', description: 'Suara pria Indonesia yang jelas' },
-            { id: 'Sari', name: 'Sari', gender: 'Female', description: 'Suara wanita Indonesia yang lembut' },
-            { id: 'Budi', name: 'Budi', gender: 'Male', description: 'Suara pria dewasa yang tegas' },
-            { id: 'Dewi', name: 'Dewi', gender: 'Female', description: 'Suara wanita profesional' },
-            { id: 'Rudi', name: 'Rudi', gender: 'Male', description: 'Suara pria muda yang energik' },
-            { id: 'Maya', name: 'Maya', gender: 'Female', description: 'Suara wanita ramah dan hangat' }
+            { id: 'Andi', name: 'Andi', gender: 'Male', description: 'Suara pria Indonesia yang jelas', pitch: 0.8 },
+            { id: 'Sari', name: 'Sari', gender: 'Female', description: 'Suara wanita Indonesia yang lembut', pitch: 1.2 },
+            { id: 'Budi', name: 'Budi', gender: 'Male', description: 'Suara pria dewasa yang tegas', pitch: 0.7 },
+            { id: 'Dewi', name: 'Dewi', gender: 'Female', description: 'Suara wanita profesional', pitch: 1.1 },
+            { id: 'Rudi', name: 'Rudi', gender: 'Male', description: 'Suara pria muda yang energik', pitch: 0.9 },
+            { id: 'Maya', name: 'Maya', gender: 'Female', description: 'Suara wanita ramah dan hangat', pitch: 1.3 }
         ];
 
         // Initialize the app
         async function init() {
             setupEventListeners();
             loadVoices();
-            checkConfiguration();
             loadSavedApiKey();
         }
 
         // Load saved API key
         function loadSavedApiKey() {
-            // Pre-configured API key
             apiKey = 'AIzaSyARvi8ZutwlLRay6S8zGRoqQt-wI1-mVUg';
-        }
-
-        // Check configuration
-        function checkConfiguration() {
-            // Configuration is pre-set
         }
 
         // Load voices
@@ -304,67 +291,31 @@
                     throw new Error('Browser tidak mendukung Text-to-Speech');
                 }
 
-                // Get available voices
-                const voices = await getBrowserVoices();
                 const utterance = new SpeechSynthesisUtterance(previewText);
                 
-                // Select voice based on our voice ID
-                let selectedVoice = null;
-                
-                // Find the voice configuration
-                const voiceConfig = googleVoices.find(v => v.id === voice.id);
-                
-                if (voiceConfig && voiceConfig.gender === 'Female') {
-                    // Female voices - prioritize Indonesian female voices
-                    selectedVoice = voices.find(v => v.lang && v.lang.startsWith('id') && v.name.toLowerCase().includes('female')) ||
-                                 voices.find(v => v.lang && v.lang.startsWith('id') && v.name.toLowerCase().includes('wanita')) ||
-                                 voices.find(v => v.name.toLowerCase().includes('indonesia') && v.name.toLowerCase().includes('female')) ||
-                                 voices.find(v => v.name.toLowerCase().includes('female')) ||
-                                 voices.find(v => v.name.toLowerCase().includes('woman')) ||
-                                 voices.find(v => v.gender === 'female') ||
-                                 voices.filter(v => !v.name.toLowerCase().includes('male'))[0] ||
-                                 voices[Math.floor(voices.length * 0.6)]; // Try to get a higher-pitched voice
-                } else {
-                    // Male voices - prioritize Indonesian male voices
-                    selectedVoice = voices.find(v => v.lang && v.lang.startsWith('id') && v.name.toLowerCase().includes('male')) ||
-                                 voices.find(v => v.lang && v.lang.startsWith('id') && v.name.toLowerCase().includes('pria')) ||
-                                 voices.find(v => v.name.toLowerCase().includes('indonesia') && v.name.toLowerCase().includes('male')) ||
-                                 voices.find(v => v.name.toLowerCase().includes('male')) ||
-                                 voices.find(v => v.name.toLowerCase().includes('man')) ||
-                                 voices.find(v => v.gender === 'male') ||
-                                 voices.filter(v => v.name.toLowerCase().includes('male'))[0] ||
-                                 voices[0]; // Default to first voice for male
-                }
-
-                if (selectedVoice) {
-                    utterance.voice = selectedVoice;
-                }
-
+                // Apply voice settings
                 utterance.rate = 1;
                 utterance.volume = 0.8;
-                utterance.pitch = voiceConfig ? voiceConfig.pitch : 1;
+                utterance.pitch = voice.pitch || 1;
 
                 utterance.onend = () => {
-                    // Reset button state
                     buttonElement.textContent = originalText;
                     buttonElement.classList.remove('preview-loading');
                 };
 
                 utterance.onerror = (event) => {
-                    // Reset button state
                     buttonElement.textContent = originalText;
                     buttonElement.classList.remove('preview-loading');
-                    throw new Error('Gagal preview suara: ' + event.error);
+                    console.error('Preview error:', event.error);
                 };
 
                 // Speak the preview
                 speechSynthesis.speak(utterance);
-                showStatus(`Preview: ${voice.name} (${selectedVoice ? selectedVoice.name : 'Default'})`, 'info');
+                showStatus(`Preview: ${voice.name}`, 'info');
 
             } catch (error) {
                 console.error('Error previewing voice:', error);
                 showStatus('Gagal preview suara: ' + error.message, 'error');
-                // Reset button state
                 buttonElement.textContent = originalText;
                 buttonElement.classList.remove('preview-loading');
             }
@@ -394,7 +345,6 @@
 
             const data = await response.json();
             
-            // Extract text from response
             if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
                 const textPart = data.candidates[0].content.parts.find(part => part.text);
                 if (textPart) {
@@ -403,125 +353,6 @@
             }
             
             throw new Error('No text data in response');
-        }
-
-        // Get available browser voices
-        function getBrowserVoices() {
-            return new Promise((resolve) => {
-                let voices = speechSynthesis.getVoices();
-                
-                if (voices.length > 0) {
-                    resolve(voices);
-                } else {
-                    speechSynthesis.onvoiceschanged = () => {
-                        voices = speechSynthesis.getVoices();
-                        resolve(voices);
-                    };
-                }
-            });
-        }
-
-        // Create audio recording from speech synthesis
-        async function createAudioFromSpeech(text, voiceId) {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    if (!('speechSynthesis' in window)) {
-                        reject(new Error('Browser tidak mendukung Text-to-Speech'));
-                        return;
-                    }
-
-                    // Get available voices
-                    const voices = await getBrowserVoices();
-                    
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    
-                    // Select voice based on our voice ID
-                    let selectedVoice = null;
-                    
-                    // Find the voice configuration
-                    const voiceConfig = googleVoices.find(v => v.id === voiceId);
-                    
-                    if (voiceConfig && voiceConfig.gender === 'Female') {
-                        // Female voices - prioritize Indonesian female voices
-                        selectedVoice = voices.find(v => v.lang && v.lang.startsWith('id') && v.name.toLowerCase().includes('female')) ||
-                                     voices.find(v => v.lang && v.lang.startsWith('id') && v.name.toLowerCase().includes('wanita')) ||
-                                     voices.find(v => v.name.toLowerCase().includes('indonesia') && v.name.toLowerCase().includes('female')) ||
-                                     voices.find(v => v.name.toLowerCase().includes('female')) ||
-                                     voices.find(v => v.name.toLowerCase().includes('woman')) ||
-                                     voices.find(v => v.gender === 'female') ||
-                                     voices.filter(v => !v.name.toLowerCase().includes('male'))[0] ||
-                                     voices[Math.floor(voices.length * 0.6)]; // Try to get a higher-pitched voice
-                    } else {
-                        // Male voices - prioritize Indonesian male voices
-                        selectedVoice = voices.find(v => v.lang && v.lang.startsWith('id') && v.name.toLowerCase().includes('male')) ||
-                                     voices.find(v => v.lang && v.lang.startsWith('id') && v.name.toLowerCase().includes('pria')) ||
-                                     voices.find(v => v.name.toLowerCase().includes('indonesia') && v.name.toLowerCase().includes('male')) ||
-                                     voices.find(v => v.name.toLowerCase().includes('male')) ||
-                                     voices.find(v => v.name.toLowerCase().includes('man')) ||
-                                     voices.find(v => v.gender === 'male') ||
-                                     voices.filter(v => v.name.toLowerCase().includes('male'))[0] ||
-                                     voices[0]; // Default to first voice for male
-                    }
-
-                    if (selectedVoice) {
-                        utterance.voice = selectedVoice;
-                    }
-
-                    // Apply settings
-                    const speed = parseFloat(document.getElementById('speedRange').value);
-                    const volumeRange = parseFloat(document.getElementById('volumeRange').value);
-                    const volume = Math.min(1, Math.max(0.1, (volumeRange + 50) / 100));
-                    
-                    utterance.rate = speed;
-                    utterance.volume = volume;
-                    utterance.pitch = voiceConfig ? voiceConfig.pitch : 1;
-
-                    // Create audio context for recording
-                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    const mediaStreamDestination = audioContext.createMediaStreamDestination();
-                    
-                    // Create media recorder
-                    const mediaRecorder = new MediaRecorder(mediaStreamDestination.stream);
-                    const audioChunks = [];
-
-                    mediaRecorder.ondataavailable = (event) => {
-                        if (event.data.size > 0) {
-                            audioChunks.push(event.data);
-                        }
-                    };
-
-                    mediaRecorder.onstop = () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                        resolve(audioBlob);
-                    };
-
-                    // Start recording
-                    mediaRecorder.start();
-
-                    utterance.onstart = () => {
-                        console.log('Speech started');
-                    };
-
-                    utterance.onend = () => {
-                        setTimeout(() => {
-                            mediaRecorder.stop();
-                            audioContext.close();
-                        }, 500); // Give a bit of buffer time
-                    };
-
-                    utterance.onerror = (event) => {
-                        mediaRecorder.stop();
-                        audioContext.close();
-                        reject(new Error('Speech synthesis error: ' + event.error));
-                    };
-
-                    // Start speech synthesis
-                    speechSynthesis.speak(utterance);
-
-                } catch (error) {
-                    reject(error);
-                }
-            });
         }
 
         // Select a voice
@@ -563,7 +394,7 @@
 
             // Volume control
             volumeRange.addEventListener('input', (e) => {
-                volumeValue.textContent = e.target.value + ' dB';
+                volumeValue.textContent = e.target.value + '%';
             });
 
             // Generate button
@@ -578,8 +409,6 @@
                     previewVoice(selectedVoice, previewSelectedBtn);
                 }
             });
-
-            // API key is pre-configured
 
             // Generate text button
             generateTextBtn.addEventListener('click', generateText);
@@ -599,8 +428,6 @@
                 });
             });
         }
-
-        // API key is pre-configured in the code
 
         // Generate text using AI
         async function generateText() {
@@ -647,7 +474,6 @@
             const generateIcon = document.getElementById('generateIcon');
             const generateText = document.getElementById('generateText');
             const audioPlayer = document.getElementById('audioPlayer');
-            const audioSource = document.getElementById('audioSource');
             const audioResultSection = document.getElementById('audioResultSection');
             const downloadBtn = document.getElementById('downloadBtn');
 
@@ -673,18 +499,27 @@
                     throw new Error('Browser tidak mendukung Text-to-Speech');
                 }
 
-                // Get available voices
-                const voices = await getBrowserVoices();
+                // Create speech synthesis
+                const utterance = new SpeechSynthesisUtterance(text);
                 
-                // Create audio blob using MediaRecorder
-                const audioBlob = await createAudioFromSpeechRecording(text, selectedVoice.id, voices);
+                // Apply settings
+                const speed = parseFloat(document.getElementById('speedRange').value);
+                const volume = parseFloat(document.getElementById('volumeRange').value) / 100;
+                
+                utterance.rate = speed;
+                utterance.volume = volume;
+                utterance.pitch = selectedVoice.pitch || 1;
+
+                // Create audio recording
+                const audioBlob = await recordSpeechSynthesis(utterance);
                 
                 if (audioBlob && audioBlob.size > 0) {
+                    currentAudioBlob = audioBlob;
                     const audioUrl = URL.createObjectURL(audioBlob);
                     
                     // Set up audio player
-                    audioSource.src = audioUrl;
-                    audioPlayer.load(); // Reload the audio element
+                    audioPlayer.src = audioUrl;
+                    audioPlayer.load();
                     
                     // Show audio result section
                     audioResultSection.classList.remove('hidden');
@@ -693,19 +528,13 @@
                     downloadBtn.onclick = () => {
                         const a = document.createElement('a');
                         a.href = audioUrl;
-                        let extension = '.mp3';
-                        if (audioBlob.type.includes('mp4')) {
-                            extension = '.m4a';
-                        } else if (audioBlob.type.includes('webm')) {
-                            extension = '.webm';
-                        }
-                        a.download = `speech-${selectedVoice.name}-${Date.now()}${extension}`;
+                        a.download = `speech-${selectedVoice.name}-${Date.now()}.mp3`;
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);
                     };
                     
-                    showStatus('Audio berhasil dibuat! Gunakan kontrol di bawah untuk play/pause dan download.', 'success');
+                    showStatus('Audio berhasil dibuat! Klik play untuk mendengar dan download untuk menyimpan.', 'success');
                 } else {
                     throw new Error('Gagal membuat file audio');
                 }
@@ -721,28 +550,34 @@
             }
         }
 
-        // Create audio recording from speech synthesis with better recording
-        async function createAudioFromSpeechRecording(text, voiceId, voices) {
-            return new Promise(async (resolve, reject) => {
+        // Record speech synthesis to audio blob
+        function recordSpeechSynthesis(utterance) {
+            return new Promise((resolve, reject) => {
                 try {
                     // Create audio context
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    
-                    // Create destination for recording
                     const dest = audioContext.createMediaStreamDestination();
                     
-                    // Create media recorder with MP3 support
+                    // Create media recorder
                     let mediaRecorder;
-                    if (MediaRecorder.isTypeSupported('audio/mp4')) {
-                        mediaRecorder = new MediaRecorder(dest.stream, {
-                            mimeType: 'audio/mp4'
-                        });
-                    } else if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-                        mediaRecorder = new MediaRecorder(dest.stream, {
-                            mimeType: 'audio/webm;codecs=opus'
-                        });
-                    } else {
-                        mediaRecorder = new MediaRecorder(dest.stream);
+                    const options = [
+                        { mimeType: 'audio/webm;codecs=opus' },
+                        { mimeType: 'audio/webm' },
+                        { mimeType: 'audio/mp4' },
+                        {}
+                    ];
+                    
+                    for (let option of options) {
+                        try {
+                            mediaRecorder = new MediaRecorder(dest.stream, option);
+                            break;
+                        } catch (e) {
+                            continue;
+                        }
+                    }
+                    
+                    if (!mediaRecorder) {
+                        throw new Error('MediaRecorder tidak didukung');
                     }
                     
                     const audioChunks = [];
@@ -754,54 +589,10 @@
                     };
                     
                     mediaRecorder.onstop = () => {
-                        let mimeType = 'audio/mp3';
-                        if (MediaRecorder.isTypeSupported('audio/mp4')) {
-                            mimeType = 'audio/mp4';
-                        } else if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-                            mimeType = 'audio/webm';
-                        }
-                        const audioBlob = new Blob(audioChunks, { type: mimeType });
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
                         audioContext.close();
                         resolve(audioBlob);
                     };
-                    
-                    // Create speech synthesis utterance
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    
-                    // Select voice based on our voice ID
-                    let selectedBrowserVoice = null;
-                    
-                    if (voiceId === 'Sari' || voiceId === 'Dewi' || voiceId === 'Maya') {
-                        // Female voices - prioritize Indonesian voices
-                        selectedBrowserVoice = voices.find(v => v.lang && v.lang.startsWith('id')) ||
-                                             voices.find(v => v.name.toLowerCase().includes('indonesia')) ||
-                                             voices.find(v => v.name.toLowerCase().includes('female')) ||
-                                             voices.find(v => v.name.toLowerCase().includes('woman')) ||
-                                             voices.find(v => v.gender === 'female') ||
-                                             voices.find(v => !v.name.toLowerCase().includes('male')) ||
-                                             voices[Math.floor(voices.length / 2)];
-                    } else {
-                        // Male voices - prioritize Indonesian voices
-                        selectedBrowserVoice = voices.find(v => v.lang && v.lang.startsWith('id')) ||
-                                             voices.find(v => v.name.toLowerCase().includes('indonesia')) ||
-                                             voices.find(v => v.name.toLowerCase().includes('male')) ||
-                                             voices.find(v => v.name.toLowerCase().includes('man')) ||
-                                             voices.find(v => v.gender === 'male') ||
-                                             voices[0];
-                    }
-
-                    if (selectedBrowserVoice) {
-                        utterance.voice = selectedBrowserVoice;
-                    }
-
-                    // Apply settings
-                    const speed = parseFloat(document.getElementById('speedRange').value);
-                    const volumeRange = parseFloat(document.getElementById('volumeRange').value);
-                    const volume = Math.min(1, Math.max(0.1, (volumeRange + 50) / 100));
-                    
-                    utterance.rate = speed;
-                    utterance.volume = volume;
-                    utterance.pitch = voiceConfig ? voiceConfig.pitch : 1;
                     
                     // Start recording
                     mediaRecorder.start();
@@ -811,7 +602,6 @@
                     };
                     
                     utterance.onend = () => {
-                        // Stop recording after a short delay
                         setTimeout(() => {
                             mediaRecorder.stop();
                         }, 500);
@@ -852,5 +642,5 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', init);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98066cb5013ea110',t:'MTc1ODA4OTI2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98067e02348ddaa5',t:'MTc1ODA4OTk2OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
