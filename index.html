@@ -175,7 +175,7 @@
                 
                 <!-- Audio Player -->
                 <audio id="audioPlayer" controls class="w-full mb-3" controlsList="nodownload">
-                    <source id="audioSource" src="" type="audio/wav">
+                    <source id="audioSource" src="" type="audio/mpeg">
                     Browser Anda tidak mendukung audio player.
                 </audio>
                 
@@ -311,23 +311,29 @@
                 // Select voice based on our voice ID
                 let selectedVoice = null;
                 
-                if (voice.id === 'Sari' || voice.id === 'Dewi' || voice.id === 'Maya') {
-                    // Female voices - prioritize Indonesian voices
-                    selectedVoice = voices.find(v => v.lang && v.lang.startsWith('id')) ||
-                                 voices.find(v => v.name.toLowerCase().includes('indonesia')) ||
+                // Find the voice configuration
+                const voiceConfig = googleVoices.find(v => v.id === voice.id);
+                
+                if (voiceConfig && voiceConfig.gender === 'Female') {
+                    // Female voices - prioritize Indonesian female voices
+                    selectedVoice = voices.find(v => v.lang && v.lang.startsWith('id') && v.name.toLowerCase().includes('female')) ||
+                                 voices.find(v => v.lang && v.lang.startsWith('id') && v.name.toLowerCase().includes('wanita')) ||
+                                 voices.find(v => v.name.toLowerCase().includes('indonesia') && v.name.toLowerCase().includes('female')) ||
                                  voices.find(v => v.name.toLowerCase().includes('female')) ||
                                  voices.find(v => v.name.toLowerCase().includes('woman')) ||
                                  voices.find(v => v.gender === 'female') ||
-                                 voices.find(v => !v.name.toLowerCase().includes('male')) ||
-                                 voices[Math.floor(voices.length / 2)];
+                                 voices.filter(v => !v.name.toLowerCase().includes('male'))[0] ||
+                                 voices[Math.floor(voices.length * 0.6)]; // Try to get a higher-pitched voice
                 } else {
-                    // Male voices - prioritize Indonesian voices
-                    selectedVoice = voices.find(v => v.lang && v.lang.startsWith('id')) ||
-                                 voices.find(v => v.name.toLowerCase().includes('indonesia')) ||
+                    // Male voices - prioritize Indonesian male voices
+                    selectedVoice = voices.find(v => v.lang && v.lang.startsWith('id') && v.name.toLowerCase().includes('male')) ||
+                                 voices.find(v => v.lang && v.lang.startsWith('id') && v.name.toLowerCase().includes('pria')) ||
+                                 voices.find(v => v.name.toLowerCase().includes('indonesia') && v.name.toLowerCase().includes('male')) ||
                                  voices.find(v => v.name.toLowerCase().includes('male')) ||
                                  voices.find(v => v.name.toLowerCase().includes('man')) ||
                                  voices.find(v => v.gender === 'male') ||
-                                 voices[0];
+                                 voices.filter(v => v.name.toLowerCase().includes('male'))[0] ||
+                                 voices[0]; // Default to first voice for male
                 }
 
                 if (selectedVoice) {
@@ -336,7 +342,7 @@
 
                 utterance.rate = 1;
                 utterance.volume = 0.8;
-                utterance.pitch = 1;
+                utterance.pitch = voiceConfig ? voiceConfig.pitch : 1;
 
                 utterance.onend = () => {
                     // Reset button state
@@ -432,23 +438,29 @@
                     // Select voice based on our voice ID
                     let selectedVoice = null;
                     
-                    if (voiceId === 'Sari' || voiceId === 'Dewi' || voiceId === 'Maya') {
-                        // Female voices - prioritize Indonesian voices
-                        selectedVoice = voices.find(v => v.lang && v.lang.startsWith('id')) ||
-                                     voices.find(v => v.name.toLowerCase().includes('indonesia')) ||
+                    // Find the voice configuration
+                    const voiceConfig = googleVoices.find(v => v.id === voiceId);
+                    
+                    if (voiceConfig && voiceConfig.gender === 'Female') {
+                        // Female voices - prioritize Indonesian female voices
+                        selectedVoice = voices.find(v => v.lang && v.lang.startsWith('id') && v.name.toLowerCase().includes('female')) ||
+                                     voices.find(v => v.lang && v.lang.startsWith('id') && v.name.toLowerCase().includes('wanita')) ||
+                                     voices.find(v => v.name.toLowerCase().includes('indonesia') && v.name.toLowerCase().includes('female')) ||
                                      voices.find(v => v.name.toLowerCase().includes('female')) ||
                                      voices.find(v => v.name.toLowerCase().includes('woman')) ||
                                      voices.find(v => v.gender === 'female') ||
-                                     voices.find(v => !v.name.toLowerCase().includes('male')) ||
-                                     voices[Math.floor(voices.length / 2)]; // fallback to middle voice
+                                     voices.filter(v => !v.name.toLowerCase().includes('male'))[0] ||
+                                     voices[Math.floor(voices.length * 0.6)]; // Try to get a higher-pitched voice
                     } else {
-                        // Male voices - prioritize Indonesian voices
-                        selectedVoice = voices.find(v => v.lang && v.lang.startsWith('id')) ||
-                                     voices.find(v => v.name.toLowerCase().includes('indonesia')) ||
+                        // Male voices - prioritize Indonesian male voices
+                        selectedVoice = voices.find(v => v.lang && v.lang.startsWith('id') && v.name.toLowerCase().includes('male')) ||
+                                     voices.find(v => v.lang && v.lang.startsWith('id') && v.name.toLowerCase().includes('pria')) ||
+                                     voices.find(v => v.name.toLowerCase().includes('indonesia') && v.name.toLowerCase().includes('male')) ||
                                      voices.find(v => v.name.toLowerCase().includes('male')) ||
                                      voices.find(v => v.name.toLowerCase().includes('man')) ||
                                      voices.find(v => v.gender === 'male') ||
-                                     voices[0]; // fallback to first voice
+                                     voices.filter(v => v.name.toLowerCase().includes('male'))[0] ||
+                                     voices[0]; // Default to first voice for male
                     }
 
                     if (selectedVoice) {
@@ -462,7 +474,7 @@
                     
                     utterance.rate = speed;
                     utterance.volume = volume;
-                    utterance.pitch = 1;
+                    utterance.pitch = voiceConfig ? voiceConfig.pitch : 1;
 
                     // Create audio context for recording
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -681,7 +693,13 @@
                     downloadBtn.onclick = () => {
                         const a = document.createElement('a');
                         a.href = audioUrl;
-                        a.download = `speech-${selectedVoice.name}-${Date.now()}.wav`;
+                        let extension = '.mp3';
+                        if (audioBlob.type.includes('mp4')) {
+                            extension = '.m4a';
+                        } else if (audioBlob.type.includes('webm')) {
+                            extension = '.webm';
+                        }
+                        a.download = `speech-${selectedVoice.name}-${Date.now()}${extension}`;
                         document.body.appendChild(a);
                         a.click();
                         document.body.removeChild(a);
@@ -713,10 +731,19 @@
                     // Create destination for recording
                     const dest = audioContext.createMediaStreamDestination();
                     
-                    // Create media recorder
-                    const mediaRecorder = new MediaRecorder(dest.stream, {
-                        mimeType: 'audio/webm;codecs=opus'
-                    });
+                    // Create media recorder with MP3 support
+                    let mediaRecorder;
+                    if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                        mediaRecorder = new MediaRecorder(dest.stream, {
+                            mimeType: 'audio/mp4'
+                        });
+                    } else if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                        mediaRecorder = new MediaRecorder(dest.stream, {
+                            mimeType: 'audio/webm;codecs=opus'
+                        });
+                    } else {
+                        mediaRecorder = new MediaRecorder(dest.stream);
+                    }
                     
                     const audioChunks = [];
                     
@@ -727,7 +754,13 @@
                     };
                     
                     mediaRecorder.onstop = () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        let mimeType = 'audio/mp3';
+                        if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                            mimeType = 'audio/mp4';
+                        } else if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                            mimeType = 'audio/webm';
+                        }
+                        const audioBlob = new Blob(audioChunks, { type: mimeType });
                         audioContext.close();
                         resolve(audioBlob);
                     };
@@ -768,7 +801,7 @@
                     
                     utterance.rate = speed;
                     utterance.volume = volume;
-                    utterance.pitch = 1;
+                    utterance.pitch = voiceConfig ? voiceConfig.pitch : 1;
                     
                     // Start recording
                     mediaRecorder.start();
@@ -819,5 +852,5 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', init);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98065d91b576832a',t:'MTc1ODA4ODY0MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98066cb5013ea110',t:'MTc1ODA4OTI2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
