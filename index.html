@@ -210,17 +210,11 @@
         function loadSavedApiKey() {
             // Pre-configured API key
             apiKey = 'AIzaSyARvi8ZutwlLRay6S8zGRoqQt-wI1-mVUg';
-            updateConfigNotice(true);
         }
 
         // Check configuration
         function checkConfiguration() {
-            updateConfigNotice(!!apiKey);
-        }
-
-        // Update config notice
-        function updateConfigNotice(hasKey) {
-            // Notice removed - API key is pre-configured
+            // Configuration is pre-set
         }
 
         // Load voices
@@ -430,7 +424,6 @@
             const generateBtn = document.getElementById('generateBtn');
             const changeVoiceBtn = document.getElementById('changeVoiceBtn');
             const previewSelectedBtn = document.getElementById('previewSelectedBtn');
-            const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
             const generateTextBtn = document.getElementById('generateTextBtn');
 
             // Speed control
@@ -456,8 +449,7 @@
                 }
             });
 
-            // Save API key button
-            saveApiKeyBtn.addEventListener('click', saveApiKey);
+            // API key is pre-configured
 
             // Generate text button
             generateTextBtn.addEventListener('click', generateText);
@@ -478,21 +470,7 @@
             });
         }
 
-        // Save API key
-        function saveApiKey() {
-            const keyInput = document.getElementById('apiKeyInput');
-            const key = keyInput.value.trim();
-            
-            if (!key) {
-                showStatus('Masukkan API key terlebih dahulu', 'error');
-                return;
-            }
-
-            apiKey = key;
-            localStorage.setItem('google_ai_api_key', key);
-            updateConfigNotice(true);
-            showStatus('API key berhasil disimpan!', 'success');
-        }
+        // API key is pre-configured in the code
 
         // Generate text using AI
         async function generateText() {
@@ -604,5 +582,5 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', init);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98062fb500caf8fa',t:'MTc1ODA4Njc2Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'980636e027aefd98',t:'MTc1ODA4NzA1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
