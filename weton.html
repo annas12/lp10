@@ -512,56 +512,38 @@ document.getElementById('btnWA').addEventListener('click', ()=>{
   }
 });
   
-  // ====== BRIDGE IKLAN INTERSTITIAL ======
+// ===== BRIDGE IKLAN INTERSTITIAL (WebsiteToAPK) =====
 let _lastAdAt = 0;
-const _AD_COOLDOWN_MS = 15000; // cegah spam klik 15 dtk
+const _AD_COOLDOWN_MS = 15000;
 
-function preloadInterstitialSafe() {
+function preloadInterstitialSafe(){
   try {
-    if (window.Android && typeof Android.loadInterstitialAd === 'function') {
-      Android.loadInterstitialAd(); // tidak semua versi ada; aman kalau tidak ada
-    }
-  } catch (e) {}
+    if (window.Android?.loadInterstitialAd) Android.loadInterstitialAd();
+  } catch(_) {}
 }
 
-function showInterstitialSafe() {
-  // matikan via query ?ad=off (opsional)
-  if (new URLSearchParams(location.search).get('ad') === 'off') return;
-
+function showInterstitialSafe(){
   const now = Date.now();
-  if (now - _lastAdAt < _AD_COOLDOWN_MS) return; // throttle
+  if (new URLSearchParams(location.search).get('ad') === 'off') return;
+  if (now - _lastAdAt < _AD_COOLDOWN_MS) return;
   _lastAdAt = now;
 
   try {
-    // 1) Bridge WebsiteToAPK yang paling umum
     if (window.Android && typeof Android.showInterstitialAd === 'function') {
       Android.showInterstitialAd();
-      // preload lagi untuk tayangan berikutnya
       setTimeout(preloadInterstitialSafe, 3000);
       return;
     }
-    // 2) Fallback URL scheme (beberapa build lama)
-    try { location.href = 'websitetoapk://showInterstitialAd'; } catch(e){}
+    // fallback scheme (beberapa build lama)
+    try { location.href = 'websitetoapk://showInterstitialAd'; } catch(_){}
     setTimeout(preloadInterstitialSafe, 3000);
-  } catch (e) {
-    console.debug('Interstitial error:', e);
+  } catch(e){
+    console.log('Interstitial error:', e);
   }
 }
 
-// Preload saat halaman siap agar iklan sudah “siap” ketika tombol diklik
 document.addEventListener('DOMContentLoaded', preloadInterstitialSafe);
-// Fungsi untuk memanggil iklan interstitial
-function showInterstitialSafe() {
-  try {
-    if (window.Android && typeof Android.showInterstitialAd === "function") {
-      Android.showInterstitialAd();
-    } else {
-      console.log("Interstitial method tidak ditemukan");
-    }
-  } catch (e) {
-    console.log("Error interstitial:", e);
-  }
-}
+
 
 </script>
 </body>
