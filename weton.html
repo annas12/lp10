@@ -14,13 +14,11 @@
       --coklat-300:#d7ccc8; --coklat-200:#efebe9; --coklat-100:#f7f2ee; --amber:#f6d087;
     }
     body{ background:var(--coklat-100); color:var(--coklat-900); }
-    /* Background batik halus (sangat tipis supaya hemat ruang visual) */
     .bg-batik {
       background:
         radial-gradient(circle at 8% 10%, rgba(246,208,135,.18) 0 20%, transparent 21%),
         radial-gradient(circle at 92% 90%, rgba(246,208,135,.18) 0 20%, transparent 21%);
     }
-    /* Kartu berbingkai motif */
     .kartu-batik {
       position: relative;
       border: 2px solid var(--amber);
@@ -37,7 +35,6 @@
         radial-gradient(ellipse at top left, rgba(246,208,135,.16), transparent 60%),
         radial-gradient(ellipse at bottom right, rgba(246,208,135,.16), transparent 60%);
     }
-    /* Ornamen SVG sudut */
     .ornamen-wrap{ position:relative; }
     .ornamen-top-left, .ornamen-bottom-right{
       position:absolute; width:100px; height:100px; opacity:.35; z-index:1; pointer-events:none;
@@ -46,13 +43,11 @@
     .ornamen-top-left{ top:-6px; left:-6px; }
     .ornamen-bottom-right{ bottom:-6px; right:-6px; transform: rotate(180deg); }
 
-    /* Tombol */
     .btn-coklat{ background: var(--coklat-700); color:#fff; }
     .btn-coklat:hover{ background: var(--coklat-800); }
     .btn-out{ border:1px solid var(--coklat-700); color: var(--coklat-700); }
     .btn-out:hover{ background: var(--coklat-700); color:#fff; }
 
-    /* Icon toggle (bulan/matahari) */
     .icon-btn{
       width:40px; height:40px; display:grid; place-items:center; border-radius:999px;
       border:1px solid rgba(61,43,31,.2); background:#fff;
@@ -61,7 +56,6 @@
     .dark .icon-btn{ background:#2a241f; border-color:#6b5a4a; }
     .dark .icon-btn:hover{ background:#3a3028; }
 
-    /* Stabilkan layout saat render PDF di mobile */
     .pdf-stable *{
       transform:none !important; filter:none !important; backdrop-filter:none !important;
       -webkit-transform:none !important; -webkit-filter:none !important;
@@ -73,7 +67,7 @@
   </style>
 </head>
 <body>
-  <!-- SVG defs: motif & wayang -->
+  <!-- SVG defs -->
   <svg width="0" height="0" style="position:absolute">
     <defs>
       <linearGradient id="gradBatik" x1="0" y1="0" x2="1" y2="1">
@@ -92,30 +86,34 @@
   </svg>
 
   <div class="max-w-5xl mx-auto px-3 sm:px-4">
-    <!-- ===== HEADER SUPER RINGKAS ===== -->
+    <!-- HEADER -->
     <header class="flex items-center justify-between py-2">
-      <!-- Logo kecil (wayang) -->
       <div class="flex items-center gap-2">
         <div class="w-9 h-9 rounded-full grid place-content-center border border-[var(--amber)] bg-batik">
           <svg viewBox="0 0 40 40" width="22" height="22" aria-hidden="true"><use href="#wayangHead"></use></svg>
         </div>
-        <!-- Judul kecil (opsional, tidak memakan tinggi) -->
         <span class="text-base font-semibold tracking-tight">Kalkulator Weton</span>
       </div>
-      <!-- Tombol toggle tema: ikon bulan/matahari -->
-      <button id="toggleTema" class="icon-btn" aria-label="Ganti tema">
-        <!-- default: bulan -->
-        <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="text-[var(--coklat-900)] dark:hidden">
-          <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
-        </svg>
-        <!-- saat dark: matahari -->
-        <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#f6d087" class="hidden dark:block">
-          <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.8 1.42-1.42zM1 13h3v-2H1v2zm10 10h2v-3h-2v3zM4.95 19.07l1.41 1.41 1.8-1.79-1.41-1.41-1.8 1.79zM13 1h-2v3h2V1zm7.05 4.93l-1.41-1.41-1.8 1.79 1.41 1.41 1.8-1.79zM20 11v2h3v-2h-3zm-8 2a3 3 0 110-6 3 3 0 010 6zm7.05 6.07l-1.8-1.79-1.41 1.41 1.79 1.8 1.42-1.42z"/>
-        </svg>
-      </button>
+      <div class="flex items-center gap-2">
+        <!-- Tombol refresh (icon) -->
+        <button id="btnRefresh" class="icon-btn" aria-label="Muat ulang">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.65 6.35A7.95 7.95 0 0012 4a8 8 0 108 8h-2a6 6 0 11-6-6c1.66 0 3.14.67 4.22 1.76L13 11h7V4l-2.35 2.35z"/>
+          </svg>
+        </button>
+        <!-- Toggle tema -->
+        <button id="toggleTema" class="icon-btn" aria-label="Ganti tema">
+          <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="text-[var(--coklat-900)] dark:hidden">
+            <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
+          </svg>
+          <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#f6d087" class="hidden dark:block">
+            <path d="M6.76 4.84l-1.8-1.79-1.41 1.41 1.79 1.8 1.42-1.42zM1 13h3v-2H1v2zm10 10h2v-3h-2v3zM4.95 19.07l1.41 1.41 1.8-1.79-1.41-1.41-1.8 1.79zM13 1h-2v3h2V1zm7.05 4.93l-1.41-1.41-1.8 1.79 1.41 1.41 1.8-1.79zM20 11v2h3v-2h-3zm-8 2a3 3 0 110-6 3 3 0 010 6zm7.05 6.07l-1.8-1.79-1.41 1.41 1.79 1.8 1.42-1.42z"/>
+          </svg>
+        </button>
+      </div>
     </header>
 
-    <!-- ===== FORM ===== -->
+    <!-- FORM -->
     <form id="wetonForm" class="mt-3 grid md:grid-cols-2 gap-4 sm:gap-6">
       <div class="space-y-3">
         <label class="block text-sm font-semibold" for="namaPria">Nama Pria</label>
@@ -135,15 +133,13 @@
       </div>
     </form>
 
-    <!-- ===== HASIL ===== -->
+    <!-- HASIL -->
     <section id="hasil" class="mt-5 hidden">
       <div class="ornamen-wrap">
-        <!-- Ornamen sudut -->
         <svg class="ornamen-top-left" viewBox="0 0 40 40" aria-hidden="true"><use href="#motifBunga"></use></svg>
         <svg class="ornamen-bottom-right" viewBox="0 0 40 40" aria-hidden="true"><use href="#motifBunga"></use></svg>
 
         <div id="hasilCard" class="kartu-batik p-5 sm:p-6 md:p-8">
-          <!-- Header kecil di kartu (tetap rapi) -->
           <div class="relative z-10 flex items-center gap-3 mb-4">
             <div class="shrink-0 rounded-full w-12 h-12 grid place-content-center border border-[var(--amber)] bg-batik">
               <svg viewBox="0 0 40 40" width="24" height="24" aria-hidden="true"><use href="#wayangHead"></use></svg>
@@ -195,16 +191,18 @@
   </div>
 
 <script>
-/* ===== Tema (ikon bulan/matahari) ===== */
+/* ===== Tema ===== */
 const root = document.documentElement;
-const toggleBtn = document.getElementById('toggleTema');
-toggleBtn.addEventListener('click', () => {
+document.getElementById('toggleTema').addEventListener('click', () => {
   const card = document.getElementById('hasilCard');
   const isDark = root.classList.toggle('dark');
   if (card) card.classList.toggle('dark', isDark);
   document.body.style.background = isDark ? '#1b1714' : 'var(--coklat-100)';
   document.body.style.color = isDark ? '#f6e9d7' : 'var(--coklat-900)';
 });
+
+/* ===== Refresh icon ===== */
+document.getElementById('btnRefresh').addEventListener('click', ()=> location.reload());
 
 /* ===== Data dasar weton & karakter ===== */
 const PASARAN = ["Legi","Pahing","Pon","Wage","Kliwon"];
@@ -285,7 +283,7 @@ const KATEGORI = [
     <p class='mt-2'><strong>Solusi:</strong> Kejujuran, terapi komunikasi, dan ruwatan weton bersama.</p>`}
 ];
 
-/* ===== Kombinasi spesifik pasaran (contoh) ===== */
+/* ===== Kombinasi spesifik contoh ===== */
 const KOMBO_SPESIFIK = {
   "Wage-Pahing":"Pribadi analitis & pendiam (Wage) bertemu energi kepemimpinan & ambisi (Pahing). Kuat di strategi; perlu melunak saat menyampaikan pendapat.",
   "Pahing-Wage":"Sosok dominan & visioner (Pahing) berpadu pasangan reflektif (Wage). Cocok untuk rencana jangka panjang; hindari mengatur berlebihan.",
@@ -294,10 +292,8 @@ const KOMBO_SPESIFIK = {
   "Kliwon-Pahing":"Intuisi kuat (Kliwon) + ambisi tinggi (Pahing). Daya dorong besar; seimbangkan batin & target duniawi."
 };
 
-/* ===== Perhitungan akurat (UTC-safe) + ANCHOR Kalenderize =====
-   PATOKAN: 22 Sep 2025 = Senin Pahing
-============================================================== */
-const ANCHOR_DATE_UTC = Date.UTC(2025, 8, 22);
+/* ===== Perhitungan (UTC-safe) ===== */
+const ANCHOR_DATE_UTC = Date.UTC(2025, 8, 22); // 22 Sep 2025 = Senin Pahing
 const ANCHOR_PASARAN  = "Pahing";
 const ANCHOR_INDEX    = PASARAN.indexOf(ANCHOR_PASARAN);
 const mod = (n,m)=>((n%m)+m)%m;
@@ -355,7 +351,7 @@ function buatSaranHari(pria, wanita, total){
   return out;
 }
 
-/* ===== Render & event ===== */
+/* ===== Helper ===== */
 const $ = s=>document.querySelector(s);
 document.getElementById('btnReset').addEventListener('click', ()=>{
   $('#wetonForm').reset(); $('#hasil').classList.add('hidden');
@@ -363,35 +359,36 @@ document.getElementById('btnReset').addEventListener('click', ()=>{
   $('#kecocokan').innerHTML = ''; $('#analisaKombinasi').innerHTML = '';
   $('#saranHari').innerHTML = ''; $('#shareHint').textContent = '';
 });
+
+/* ===== SUBMIT: tampilkan interstitial + render hasil ===== */
 document.getElementById('wetonForm').addEventListener('submit', (e)=>{
   e.preventDefault();
-  const namaPria = $('#namaPria').value.trim();
-  const namaWanita = $('#namaWanita').value.trim();
-  const tPria = $('#tglPria').value; 
-  const tWanita = $('#tglWanita').value;
 
-  if (!namaPria || !namaWanita || !tPria || !tWanita){ 
-    alert('Lengkapi semua data.'); 
-    return; 
+  const namaPria   = $('#namaPria').value.trim();
+  const namaWanita = $('#namaWanita').value.trim();
+  const tPria      = $('#tglPria').value;
+  const tWanita    = $('#tglWanita').value;
+
+  if (!namaPria || !namaWanita || !tPria || !tWanita){
+    alert('Lengkapi semua data.');
+    return;
   }
 
-  // >>> Tampilkan iklan interstitial saat tombol Proses ditekan
+  // Tampilkan iklan interstitial saat tombol Proses
   showInterstitialSafe();
 
-  // lanjutkan logika hitung weton...
-});
-
-
-  const pria = hitungWetonFromInput(tPria);
+  // Hitung & render
+  const pria   = hitungWetonFromInput(tPria);
   const wanita = hitungWetonFromInput(tWanita);
-  const total = pria.neptu + wanita.neptu;
-  const kat = kategoriDariTotal(total);
+  const total  = pria.neptu + wanita.neptu;
+  const kat    = kategoriDariTotal(total);
 
   $('#dataPria').innerHTML = `
     <div><strong>Nama:</strong> ${namaPria}</div>
     <div><strong>Weton:</strong> ${pria.hari} ${pria.pasaran}</div>
     <div><strong>Neptu:</strong> ${pria.neptu}</div>
     <div class="mt-1">${karakterLengkap(pria)}</div>`;
+
   $('#dataWanita').innerHTML = `
     <div><strong>Nama:</strong> ${namaWanita}</div>
     <div><strong>Weton:</strong> ${wanita.hari} ${wanita.pasaran}</div>
@@ -411,19 +408,21 @@ document.getElementById('wetonForm').addEventListener('submit', (e)=>{
   const saran = buatSaranHari(pria, wanita, total);
   $('#saranHari').innerHTML = saran.join('');
 
-  $('#hasil').classList.remove('hidden'); $('#shareHint').textContent = '';
+  $('#hasil').classList.remove('hidden');
+  $('#shareHint').textContent = '';
 
-  window._ringkasanText = `Kalkulator Weton\n\n`+
+  window._ringkasanText =
+    `Kalkulator Weton\n\n`+
     `Pria: ${namaPria} (${pria.hari} ${pria.pasaran}, neptu ${pria.neptu})\n`+
     `Wanita: ${namaWanita} (${wanita.hari} ${wanita.pasaran}, neptu ${wanita.neptu})\n`+
     `Total Neptu: ${total} → ${kat.name}\n`+
     `Saran Hari: ` + saran.map(li => li.replace(/<[^>]+>/g,'')).join(' | ');
 });
 
-/* ===== PDF Mobile-friendly (multi-halaman, stabil) ===== */
+/* ===== PDF ===== */
 async function exportToPDFMultiPage(node){
   const { jsPDF } = window.jspdf;
-  await new Promise(r=>requestAnimationFrame(r)); // tunggu layout settle
+  await new Promise(r=>requestAnimationFrame(r));
   node.classList.add('pdf-stable');
   const prevScrollY = window.scrollY; window.scrollTo(0,0);
 
@@ -440,20 +439,18 @@ async function exportToPDFMultiPage(node){
   const pdf = new jsPDF({orientation:'p', unit:'pt', format:'a4'});
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
-  const margin = 24;
-  const headerH = 46;
-  const footerH = 22;
+  const margin = 24, headerH = 46, footerH = 22;
   const usableH = pageH - headerH - footerH;
   const imgW = pageW - margin*2;
   const imgH = canvas.height * (imgW / canvas.width);
 
-  const writeHeaderFooter = (pageIndex) => {
+  const writeHeaderFooter = (i) => {
     pdf.setFillColor(247,242,238); pdf.rect(0,0,pageW,headerH,'F');
     pdf.setTextColor(61,43,31); pdf.setFontSize(13);
     pdf.text('Kalkulator Weton – Analisa Jodoh & Hari Baik', margin, headerH - 16);
     pdf.setFontSize(9); pdf.setTextColor(120);
     const ts = new Date().toLocaleString('id-ID');
-    pdf.text(`Dihasilkan • ${ts} • Hal ${pageIndex+1}`, margin, pageH - 8);
+    pdf.text(`Dihasilkan • ${ts} • Hal ${i+1}`, margin, pageH - 8);
   };
 
   if (imgH <= usableH){
@@ -511,20 +508,21 @@ document.getElementById('btnWA').addEventListener('click', ()=>{
     document.getElementById('shareHint').textContent = 'Tautan WhatsApp diblokir. Ringkasan disalin—tempel manual di WhatsApp.';
   }
 });
-  
-// ===== BRIDGE IKLAN INTERSTITIAL (WebsiteToAPK) =====
+
+/* ====== BRIDGE IKLAN INTERSTITIAL (WebsiteToAPK) ====== */
 let _lastAdAt = 0;
 const _AD_COOLDOWN_MS = 15000;
 
-function preloadInterstitialSafe(){
+function preloadInterstitialSafe() {
   try {
-    if (window.Android?.loadInterstitialAd) Android.loadInterstitialAd();
-  } catch(_) {}
+    if (window.Android && typeof Android.loadInterstitialAd === 'function') {
+      Android.loadInterstitialAd(); // optional, tak semua build punya
+    }
+  } catch (e) {}
 }
-
-function showInterstitialSafe(){
-  const now = Date.now();
+function showInterstitialSafe() {
   if (new URLSearchParams(location.search).get('ad') === 'off') return;
+  const now = Date.now();
   if (now - _lastAdAt < _AD_COOLDOWN_MS) return;
   _lastAdAt = now;
 
@@ -534,17 +532,14 @@ function showInterstitialSafe(){
       setTimeout(preloadInterstitialSafe, 3000);
       return;
     }
-    // fallback scheme (beberapa build lama)
-    try { location.href = 'websitetoapk://showInterstitialAd'; } catch(_){}
+    // fallback scheme utk beberapa build lama
+    try { location.href = 'websitetoapk://showInterstitialAd'; } catch(e){}
     setTimeout(preloadInterstitialSafe, 3000);
-  } catch(e){
-    console.log('Interstitial error:', e);
+  } catch (e) {
+    console.debug('Interstitial error:', e);
   }
 }
-
 document.addEventListener('DOMContentLoaded', preloadInterstitialSafe);
-
-
 </script>
 </body>
 </html>
