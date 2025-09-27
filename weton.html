@@ -367,11 +367,19 @@ document.getElementById('wetonForm').addEventListener('submit', (e)=>{
   e.preventDefault();
   const namaPria = $('#namaPria').value.trim();
   const namaWanita = $('#namaWanita').value.trim();
-  const tPria = $('#tglPria').value; const tWanita = $('#tglWanita').value;
-  if (!namaPria || !namaWanita || !tPria || !tWanita){ alert('Lengkapi semua data.'); return; }
+  const tPria = $('#tglPria').value; 
+  const tWanita = $('#tglWanita').value;
 
-  // >>> Tampilkan interstitial persis saat user klik Proses <<<
+  if (!namaPria || !namaWanita || !tPria || !tWanita){ 
+    alert('Lengkapi semua data.'); 
+    return; 
+  }
+
+  // >>> Tampilkan iklan interstitial saat tombol Proses ditekan
   showInterstitialSafe();
+
+  // lanjutkan logika hitung weton...
+});
 
 
   const pria = hitungWetonFromInput(tPria);
@@ -542,6 +550,18 @@ function showInterstitialSafe() {
 
 // Preload saat halaman siap agar iklan sudah “siap” ketika tombol diklik
 document.addEventListener('DOMContentLoaded', preloadInterstitialSafe);
+// Fungsi untuk memanggil iklan interstitial
+function showInterstitialSafe() {
+  try {
+    if (window.Android && typeof Android.showInterstitialAd === "function") {
+      Android.showInterstitialAd();
+    } else {
+      console.log("Interstitial method tidak ditemukan");
+    }
+  } catch (e) {
+    console.log("Error interstitial:", e);
+  }
+}
 
 </script>
 </body>
