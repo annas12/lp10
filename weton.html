@@ -370,6 +370,10 @@ document.getElementById('wetonForm').addEventListener('submit', (e)=>{
   const tPria = $('#tglPria').value; const tWanita = $('#tglWanita').value;
   if (!namaPria || !namaWanita || !tPria || !tWanita){ alert('Lengkapi semua data.'); return; }
 
+  // >>> Tampilkan interstitial persis saat user klik Proses <<<
+  showInterstitialSafe();
+
+
   const pria = hitungWetonFromInput(tPria);
   const wanita = hitungWetonFromInput(tWanita);
   const total = pria.neptu + wanita.neptu;
@@ -499,6 +503,46 @@ document.getElementById('btnWA').addEventListener('click', ()=>{
     document.getElementById('shareHint').textContent = 'Tautan WhatsApp diblokir. Ringkasan disalin—tempel manual di WhatsApp.';
   }
 });
+  
+  // ====== BRIDGE IKLAN INTERSTITIAL ======
+let _lastAdAt = 0;
+const _AD_COOLDOWN_MS = 15000; // cegah spam klik 15 dtk
+
+function preloadInterstitialSafe() {
+  try {
+    if (window.Android && typeof Android.loadInterstitialAd === 'function') {
+      Android.loadInterstitialAd(); // tidak semua versi ada; aman kalau tidak ada
+    }
+  } catch (e) {}
+}
+
+function showInterstitialSafe() {
+  // matikan via query ?ad=off (opsional)
+  if (new URLSearchParams(location.search).get('ad') === 'off') return;
+
+  const now = Date.now();
+  if (now - _lastAdAt < _AD_COOLDOWN_MS) return; // throttle
+  _lastAdAt = now;
+
+  try {
+    // 1) Bridge WebsiteToAPK yang paling umum
+    if (window.Android && typeof Android.showInterstitialAd === 'function') {
+      Android.showInterstitialAd();
+      // preload lagi untuk tayangan berikutnya
+      setTimeout(preloadInterstitialSafe, 3000);
+      return;
+    }
+    // 2) Fallback URL scheme (beberapa build lama)
+    try { location.href = 'websitetoapk://showInterstitialAd'; } catch(e){}
+    setTimeout(preloadInterstitialSafe, 3000);
+  } catch (e) {
+    console.debug('Interstitial error:', e);
+  }
+}
+
+// Preload saat halaman siap agar iklan sudah “siap” ketika tombol diklik
+document.addEventListener('DOMContentLoaded', preloadInterstitialSafe);
+
 </script>
 </body>
 </html>
