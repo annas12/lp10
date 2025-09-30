@@ -48,32 +48,17 @@
         <!-- Header -->
         <div class="text-center mb-8">
             <h1 class="text-4xl font-bold text-white mb-2">🎤 AI Voice Generator</h1>
-            <p class="text-white/80 text-lg">Ubah teks menjadi suara dengan berbagai emosi dan karakter</p>
+            <p class="text-white/80 text-lg">Powered by Gemini 2.5 Pro TTS - Kualitas suara terbaik dengan AI</p>
         </div>
 
         <!-- Main Card -->
         <div class="max-w-4xl mx-auto glass-effect rounded-2xl p-8 shadow-2xl">
 
-
-
-
-            <!-- Debug Section -->
+            <!-- API Status (Hidden Setup) -->
             <div class="mb-6">
-                <div class="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4">
-                    <h3 class="text-yellow-200 font-semibold mb-3">🔧 Debug Tools</h3>
-                    <div class="grid md:grid-cols-3 gap-3">
-                        <button id="testWorkerBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm transition-colors">
-                            1️⃣ Test Worker
-                        </button>
-                        <button id="testAudioBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm transition-colors">
-                            2️⃣ Test Audio Context
-                        </button>
-                        <button id="testTTSBtn" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded text-sm transition-colors">
-                            3️⃣ Test TTS API
-                        </button>
-                    </div>
-                    <div id="debugLog" class="mt-3 bg-black/30 rounded p-3 text-green-300 text-xs font-mono max-h-32 overflow-y-auto hidden">
-                        <div class="text-green-400 mb-1">Debug Log:</div>
+                <div class="bg-gradient-to-r from-green-500/20 to-blue-500/20 border border-green-500/50 rounded-lg p-4 text-center">
+                    <div id="apiStatus" class="text-green-300 text-sm">
+                        ✅ Gemini 2.5 Pro TTS siap digunakan
                     </div>
                 </div>
             </div>
@@ -89,20 +74,16 @@
             <div class="grid md:grid-cols-2 gap-6 mb-6">
                 <!-- Voice Talent -->
                 <div>
-                    <label class="block text-white font-semibold mb-2">🎭 Pilih Talent Voice</label>
+                    <label class="block text-white font-semibold mb-2">🎭 Pilih Voice Model</label>
                     <select id="voiceSelect" class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent">
                         <option value="" class="bg-gray-800">Pilih Suara...</option>
-                        <optgroup label="👩 Suara Perempuan" class="bg-gray-800">
-                            <option value="female-1" class="bg-gray-800">Sarah - Suara Lembut</option>
-                            <option value="female-2" class="bg-gray-800">Maya - Suara Energik</option>
-                            <option value="female-3" class="bg-gray-800">Rina - Suara Profesional</option>
-                            <option value="female-4" class="bg-gray-800">Dewi - Suara Hangat</option>
-                        </optgroup>
-                        <optgroup label="👨 Suara Laki-laki" class="bg-gray-800">
-                            <option value="male-1" class="bg-gray-800">Andi - Suara Tegas</option>
-                            <option value="male-2" class="bg-gray-800">Budi - Suara Ramah</option>
-                            <option value="male-3" class="bg-gray-800">Candra - Suara Dalam</option>
-                            <option value="male-4" class="bg-gray-800">Doni - Suara Muda</option>
+                        <optgroup label="🤖 Gemini Premium Voices" class="bg-gray-800">
+                            <option value="Zephyr" class="bg-gray-800">Zephyr - Suara Profesional</option>
+                            <option value="Puck" class="bg-gray-800">Puck - Suara Ramah</option>
+                            <option value="Charon" class="bg-gray-800">Charon - Suara Dalam</option>
+                            <option value="Kore" class="bg-gray-800">Kore - Suara Lembut</option>
+                            <option value="Fenrir" class="bg-gray-800">Fenrir - Suara Tegas</option>
+                            <option value="Aoede" class="bg-gray-800">Aoede - Suara Melodis</option>
                         </optgroup>
                     </select>
                     
@@ -121,59 +102,57 @@
                     </div>
                 </div>
 
-                <!-- Emotion Preset -->
+                <!-- Speaking Style -->
                 <div>
-                    <label class="block text-white font-semibold mb-2">😊 Preset Emosi</label>
-                    <select id="emotionSelect" class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent">
-                        <option value="neutral" class="bg-gray-800">😐 Netral</option>
-                        <option value="happy" class="bg-gray-800">😊 Senang</option>
-                        <option value="sad" class="bg-gray-800">😢 Sedih</option>
-                        <option value="excited" class="bg-gray-800">🤩 Antusias</option>
+                    <label class="block text-white font-semibold mb-2">🎭 Gaya Bicara</label>
+                    <select id="styleSelect" class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent">
+                        <option value="conversational" class="bg-gray-800">💬 Percakapan</option>
+                        <option value="narrative" class="bg-gray-800">📖 Naratif</option>
+                        <option value="expressive" class="bg-gray-800">🎭 Ekspresif</option>
                         <option value="calm" class="bg-gray-800">😌 Tenang</option>
-                        <option value="serious" class="bg-gray-800">😤 Serius</option>
-                        <option value="friendly" class="bg-gray-800">😄 Ramah</option>
-                        <option value="mysterious" class="bg-gray-800">🤔 Misterius</option>
+                        <option value="energetic" class="bg-gray-800">⚡ Energik</option>
+                        <option value="professional" class="bg-gray-800">👔 Profesional</option>
                     </select>
                 </div>
             </div>
 
-            <!-- Voice Settings -->
-            <div class="grid md:grid-cols-3 gap-4 mb-6">
-                <div>
-                    <label class="block text-white font-semibold mb-2">🎵 Kecepatan</label>
-                    <select id="speedSelect" class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent">
-                        <option value="0.5" class="bg-gray-800">0.5x - Sangat Lambat</option>
-                        <option value="0.75" class="bg-gray-800">0.75x - Lambat</option>
-                        <option value="1" selected class="bg-gray-800">1x - Normal</option>
-                        <option value="1.25" class="bg-gray-800">1.25x - Cepat</option>
-                        <option value="1.5" class="bg-gray-800">1.5x - Sangat Cepat</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-white font-semibold mb-2">🎚️ Nada</label>
-                    <select id="pitchSelect" class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent">
-                        <option value="-2" class="bg-gray-800">Sangat Rendah</option>
-                        <option value="-1" class="bg-gray-800">Rendah</option>
-                        <option value="0" selected class="bg-gray-800">Normal</option>
-                        <option value="1" class="bg-gray-800">Tinggi</option>
-                        <option value="2" class="bg-gray-800">Sangat Tinggi</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-white font-semibold mb-2">🔊 Volume</label>
-                    <select id="volumeSelect" class="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent">
-                        <option value="0.3" class="bg-gray-800">30% - Pelan</option>
-                        <option value="0.5" class="bg-gray-800">50% - Sedang</option>
-                        <option value="0.7" class="bg-gray-800">70% - Keras</option>
-                        <option value="1" selected class="bg-gray-800">100% - Maksimal</option>
-                    </select>
-                </div>
+            <!-- Advanced Settings -->
+            <div class="mb-6">
+                <details class="glass-effect rounded-lg p-4">
+                    <summary class="text-white font-semibold cursor-pointer">⚙️ Pengaturan Lanjutan</summary>
+                    <div class="grid md:grid-cols-3 gap-4 mt-4">
+                        <div>
+                            <label class="block text-white font-medium mb-2">🎵 Kecepatan</label>
+                            <input type="range" id="speedRange" min="0.5" max="2" step="0.1" value="1" 
+                                   class="w-full accent-blue-500">
+                            <div class="text-white/70 text-sm text-center mt-1">
+                                <span id="speedValue">1.0x</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-white font-medium mb-2">🎚️ Nada</label>
+                            <input type="range" id="pitchRange" min="-20" max="20" step="1" value="0" 
+                                   class="w-full accent-blue-500">
+                            <div class="text-white/70 text-sm text-center mt-1">
+                                <span id="pitchValue">0</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-white font-medium mb-2">🔊 Volume</label>
+                            <input type="range" id="volumeRange" min="0" max="100" step="5" value="80" 
+                                   class="w-full accent-blue-500">
+                            <div class="text-white/70 text-sm text-center mt-1">
+                                <span id="volumeValue">80%</span>
+                            </div>
+                        </div>
+                    </div>
+                </details>
             </div>
 
             <!-- Generate Button -->
             <div class="text-center mb-6">
                 <button id="generateBtn" class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-full shadow-lg transform transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                    <span id="btnText">🎤 Generate Suara</span>
+                    <span id="btnText">🎤 Generate Suara AI</span>
                 </button>
             </div>
 
@@ -181,14 +160,14 @@
             <div id="status" class="text-center text-white/80 mb-4 hidden">
                 <div class="inline-flex items-center">
                     <div class="pulse-animation mr-2">⏳</div>
-                    <span class="loading-dots">Sedang memproses</span>
+                    <span class="loading-dots">Sedang memproses dengan Gemini AI</span>
                 </div>
             </div>
 
             <!-- Audio Player -->
             <div id="audioContainer" class="hidden">
                 <div class="glass-effect rounded-xl p-6 text-center">
-                    <h3 class="text-white font-semibold mb-4">🎵 Audio Hasil</h3>
+                    <h3 class="text-white font-semibold mb-4">🎵 Audio Hasil Gemini TTS</h3>
                     <audio id="audioPlayer" controls class="w-full mb-4" style="filter: invert(1) hue-rotate(180deg);">
                         Audio tidak didukung oleh browser Anda.
                     </audio>
@@ -207,46 +186,92 @@
             <div id="errorMessage" class="hidden bg-red-500/20 border border-red-500/50 rounded-lg p-4 text-red-200 text-center">
                 <span id="errorText"></span>
             </div>
+
+            <!-- Features Info -->
+            <div class="mt-8 grid md:grid-cols-3 gap-4 text-center">
+                <div class="glass-effect rounded-lg p-4">
+                    <div class="text-2xl mb-2">🚀</div>
+                    <h4 class="text-white font-semibold mb-1">Gemini 2.5 Pro</h4>
+                    <p class="text-white/70 text-sm">Teknologi TTS terbaru dari Google</p>
+                </div>
+                <div class="glass-effect rounded-lg p-4">
+                    <div class="text-2xl mb-2">🎭</div>
+                    <h4 class="text-white font-semibold mb-1">Multi Voice</h4>
+                    <p class="text-white/70 text-sm">6 karakter suara premium</p>
+                </div>
+                <div class="glass-effect rounded-lg p-4">
+                    <div class="text-2xl mb-2">🌍</div>
+                    <h4 class="text-white font-semibold mb-1">Bahasa Indonesia</h4>
+                    <p class="text-white/70 text-sm">Dukungan natural untuk bahasa lokal</p>
+                </div>
+            </div>
         </div>
-
-
     </div>
 
     <script>
         // API Configuration
-        const API_BASE_URL = 'https://text-suara.annasmashuri97.workers.dev';
+        const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro-preview-tts:streamGenerateContent';
         
-        // Voice data with characteristics
-        const voiceData = {
-            'female-1': { name: 'Sarah', gender: 'female', tone: 'soft', description: 'Suara lembut dan menenangkan' },
-            'female-2': { name: 'Maya', gender: 'female', tone: 'energetic', description: 'Suara penuh energi dan semangat' },
-            'female-3': { name: 'Rina', gender: 'female', tone: 'professional', description: 'Suara profesional dan jelas' },
-            'female-4': { name: 'Dewi', gender: 'female', tone: 'warm', description: 'Suara hangat dan ramah' },
-            'male-1': { name: 'Andi', gender: 'male', tone: 'firm', description: 'Suara tegas dan berwibawa' },
-            'male-2': { name: 'Budi', gender: 'male', tone: 'friendly', description: 'Suara ramah dan mudah didekati' },
-            'male-3': { name: 'Candra', gender: 'male', tone: 'deep', description: 'Suara dalam dan berkarakter' },
-            'male-4': { name: 'Doni', gender: 'male', tone: 'young', description: 'Suara muda dan fresh' }
+        // Voice data for Gemini TTS
+        const geminiVoices = {
+            'Zephyr': { 
+                name: 'Zephyr', 
+                description: 'Suara profesional dan jelas, cocok untuk presentasi dan narasi formal',
+                gender: 'neutral',
+                tone: 'professional'
+            },
+            'Puck': { 
+                name: 'Puck', 
+                description: 'Suara ramah dan hangat, ideal untuk percakapan dan konten kasual',
+                gender: 'neutral',
+                tone: 'friendly'
+            },
+            'Charon': { 
+                name: 'Charon', 
+                description: 'Suara dalam dan berwibawa, sempurna untuk konten serius',
+                gender: 'neutral',
+                tone: 'deep'
+            },
+            'Kore': { 
+                name: 'Kore', 
+                description: 'Suara lembut dan menenangkan, cocok untuk meditasi dan relaksasi',
+                gender: 'neutral',
+                tone: 'soft'
+            },
+            'Fenrir': { 
+                name: 'Fenrir', 
+                description: 'Suara tegas dan berkarakter, ideal untuk konten motivasi',
+                gender: 'neutral',
+                tone: 'firm'
+            },
+            'Aoede': { 
+                name: 'Aoede', 
+                description: 'Suara melodis dan ekspresif, sempurna untuk storytelling',
+                gender: 'neutral',
+                tone: 'melodic'
+            }
         };
 
-        // Emotion settings
-        const emotionSettings = {
-            'neutral': { pitch: 0, speed: 1, description: 'Nada bicara normal' },
-            'happy': { pitch: 0.5, speed: 1.1, description: 'Nada ceria dan optimis' },
-            'sad': { pitch: -0.5, speed: 0.9, description: 'Nada sedih dan melankolis' },
-            'excited': { pitch: 1, speed: 1.2, description: 'Nada antusias dan bersemangat' },
-            'calm': { pitch: -0.2, speed: 0.8, description: 'Nada tenang dan damai' },
-            'serious': { pitch: -0.3, speed: 0.95, description: 'Nada serius dan fokus' },
-            'friendly': { pitch: 0.3, speed: 1.05, description: 'Nada ramah dan hangat' },
-            'mysterious': { pitch: -0.8, speed: 0.85, description: 'Nada misterius dan dramatis' }
+        // Speaking styles
+        const speakingStyles = {
+            'conversational': { description: 'Gaya percakapan natural dan santai' },
+            'narrative': { description: 'Gaya bercerita yang engaging' },
+            'expressive': { description: 'Gaya ekspresif dengan emosi yang kuat' },
+            'calm': { description: 'Gaya tenang dan menenangkan' },
+            'energetic': { description: 'Gaya penuh energi dan semangat' },
+            'professional': { description: 'Gaya formal dan profesional' }
         };
 
         // DOM elements
         const textInput = document.getElementById('textInput');
         const voiceSelect = document.getElementById('voiceSelect');
-        const emotionSelect = document.getElementById('emotionSelect');
-        const speedSelect = document.getElementById('speedSelect');
-        const pitchSelect = document.getElementById('pitchSelect');
-        const volumeSelect = document.getElementById('volumeSelect');
+        const styleSelect = document.getElementById('styleSelect');
+        const speedRange = document.getElementById('speedRange');
+        const pitchRange = document.getElementById('pitchRange');
+        const volumeRange = document.getElementById('volumeRange');
+        const speedValue = document.getElementById('speedValue');
+        const pitchValue = document.getElementById('pitchValue');
+        const volumeValue = document.getElementById('volumeValue');
         const generateBtn = document.getElementById('generateBtn');
         const btnText = document.getElementById('btnText');
         const status = document.getElementById('status');
@@ -261,191 +286,91 @@
         const voicePreviewDesc = document.getElementById('voicePreviewDesc');
         const previewBtn = document.getElementById('previewBtn');
         const previewPlayer = document.getElementById('previewPlayer');
+        const apiStatus = document.getElementById('apiStatus');
         
-        // Debug elements
-        const testWorkerBtn = document.getElementById('testWorkerBtn');
-        const testAudioBtn = document.getElementById('testAudioBtn');
-        const testTTSBtn = document.getElementById('testTTSBtn');
-        const debugLog = document.getElementById('debugLog');
+        // Store API key - Ganti 'YOUR_API_KEY_HERE' dengan API key Gemini Anda
+        let geminiApiKey = 'AIzaSyBYTWnUZL5vGi0XLHX29ppOCWIGWTMcxao'; // Masukkan API key Gemini Anda di sini
 
-        // Debug logging function
-        function debugLog_add(message) {
-            console.log(message);
-            debugLog.classList.remove('hidden');
-            const logEntry = document.createElement('div');
-            logEntry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
-            debugLog.appendChild(logEntry);
-            debugLog.scrollTop = debugLog.scrollHeight;
-        }
+        // API key sudah tertanam dalam kode
+        console.log('🔑 API key loaded from code');
 
-
-
-
-        // Debug Test Functions
-        testWorkerBtn.addEventListener('click', async function() {
-            debugLog_add('🔍 Testing Cloudflare Worker...');
-            testWorkerBtn.textContent = '⏳ Testing...';
-            testWorkerBtn.disabled = true;
-            
-            try {
-                // Test basic connectivity
-                const response = await fetch(API_BASE_URL);
-                debugLog_add(`✅ Worker Response: ${response.status} ${response.statusText}`);
-                
-                const text = await response.text();
-                debugLog_add(`📄 Response Body: ${text.substring(0, 100)}...`);
-                
-                // Test specific endpoint
-                const testResponse = await fetch(API_BASE_URL + '/test');
-                if (testResponse.ok) {
-                    const testData = await testResponse.json();
-                    debugLog_add(`✅ Test Endpoint: ${JSON.stringify(testData)}`);
-                } else {
-                    debugLog_add(`❌ Test Endpoint Failed: ${testResponse.status}`);
-                }
-                
-            } catch (error) {
-                debugLog_add(`❌ Worker Error: ${error.message}`);
-            }
-            
-            testWorkerBtn.textContent = '1️⃣ Test Worker';
-            testWorkerBtn.disabled = false;
+        // Range input handlers
+        speedRange.addEventListener('input', function() {
+            speedValue.textContent = this.value + 'x';
         });
 
-        testAudioBtn.addEventListener('click', async function() {
-            debugLog_add('🎵 Testing Audio Context...');
-            testAudioBtn.textContent = '⏳ Testing...';
-            testAudioBtn.disabled = true;
-            
-            try {
-                // Test audio context creation
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                debugLog_add(`✅ AudioContext created, state: ${audioContext.state}`);
-                
-                if (audioContext.state === 'suspended') {
-                    await audioContext.resume();
-                    debugLog_add(`🔄 AudioContext resumed, new state: ${audioContext.state}`);
-                }
-                
-                // Test simple audio generation
-                const sampleRate = audioContext.sampleRate;
-                const duration = 1; // 1 second
-                const frameCount = sampleRate * duration;
-                const audioBuffer = audioContext.createBuffer(1, frameCount, sampleRate);
-                const channelData = audioBuffer.getChannelData(0);
-                
-                // Generate simple sine wave
-                for (let i = 0; i < frameCount; i++) {
-                    const t = i / sampleRate;
-                    channelData[i] = Math.sin(2 * Math.PI * 440 * t) * 0.1; // 440Hz sine wave
-                }
-                
-                debugLog_add(`✅ Audio buffer created: ${frameCount} frames, ${duration}s`);
-                
-                // Convert to WAV and test playback
-                const wavBlob = audioBufferToWav(audioBuffer);
-                debugLog_add(`✅ WAV blob created: ${wavBlob.size} bytes`);
-                
-                // Test playback
-                const audioUrl = URL.createObjectURL(wavBlob);
-                const testAudio = new Audio(audioUrl);
-                
-                testAudio.onloadeddata = function() {
-                    debugLog_add(`✅ Test audio loaded, duration: ${testAudio.duration}s`);
-                    testAudio.play().then(() => {
-                        debugLog_add('✅ Test audio playing successfully!');
-                    }).catch(err => {
-                        debugLog_add(`❌ Play error: ${err.message}`);
-                    });
-                };
-                
-                testAudio.onerror = function(e) {
-                    debugLog_add(`❌ Audio load error: ${e.message || 'Unknown error'}`);
-                };
-                
-                await audioContext.close();
-                
-            } catch (error) {
-                debugLog_add(`❌ Audio Context Error: ${error.message}`);
-            }
-            
-            testAudioBtn.textContent = '2️⃣ Test Audio Context';
-            testAudioBtn.disabled = false;
+        pitchRange.addEventListener('input', function() {
+            pitchValue.textContent = this.value;
         });
 
-        testTTSBtn.addEventListener('click', async function() {
-            debugLog_add('🗣️ Testing TTS API...');
-            testTTSBtn.textContent = '⏳ Testing...';
-            testTTSBtn.disabled = true;
-            
-            try {
-                const testData = {
-                    text: "Halo, ini adalah test audio",
-                    voiceName: 'id-ID-Standard-A',
-                    speakingRate: 1.0,
-                    pitch: 0.0,
-                    volumeGain: 0.0
-                };
-                
-                debugLog_add(`📤 Sending TTS request: ${JSON.stringify(testData)}`);
-                
-                const response = await fetch(API_BASE_URL + '/api/text-to-speech', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(testData)
-                });
-                
-                debugLog_add(`📥 TTS Response: ${response.status} ${response.statusText}`);
-                debugLog_add(`📥 Content-Type: ${response.headers.get('content-type')}`);
-                debugLog_add(`📥 Content-Length: ${response.headers.get('content-length')}`);
-                
-                if (response.ok) {
-                    const contentType = response.headers.get('content-type');
-                    if (contentType && contentType.includes('audio')) {
-                        const audioBlob = await response.blob();
-                        debugLog_add(`✅ Audio blob received: ${audioBlob.size} bytes`);
-                        
-                        // Test playback
-                        const audioUrl = URL.createObjectURL(audioBlob);
-                        const testAudio = new Audio(audioUrl);
-                        
-                        testAudio.onloadeddata = function() {
-                            debugLog_add(`✅ TTS audio loaded, duration: ${testAudio.duration}s`);
-                            testAudio.play().then(() => {
-                                debugLog_add('✅ TTS audio playing successfully!');
-                            }).catch(err => {
-                                debugLog_add(`❌ TTS play error: ${err.message}`);
-                            });
-                        };
-                        
-                        testAudio.onerror = function(e) {
-                            debugLog_add(`❌ TTS audio error: ${e.message || 'Unknown error'}`);
-                        };
-                        
-                    } else {
-                        const responseText = await response.text();
-                        debugLog_add(`❌ Not audio response: ${responseText}`);
-                    }
-                } else {
-                    const errorText = await response.text();
-                    debugLog_add(`❌ TTS API Error: ${errorText}`);
-                }
-                
-            } catch (error) {
-                debugLog_add(`❌ TTS Test Error: ${error.message}`);
-            }
-            
-            testTTSBtn.textContent = '3️⃣ Test TTS API';
-            testTTSBtn.disabled = false;
+        volumeRange.addEventListener('input', function() {
+            volumeValue.textContent = this.value + '%';
         });
 
-        // Generate speech function
+        // Voice selection handler
+        voiceSelect.addEventListener('change', function() {
+            if (this.value && geminiVoices[this.value]) {
+                const voice = geminiVoices[this.value];
+                voicePreviewName.textContent = voice.name;
+                voicePreviewDesc.textContent = voice.description;
+                voicePreview.classList.remove('hidden');
+            } else {
+                voicePreview.classList.add('hidden');
+            }
+        });
+
+        // Preview button handler
+        previewBtn.addEventListener('click', async function() {
+            const selectedVoice = voiceSelect.value;
+            if (!selectedVoice) {
+                showError('Harap pilih voice terlebih dahulu');
+                return;
+            }
+
+            if (!geminiApiKey || geminiApiKey === 'YOUR_API_KEY_HERE') {
+                showError('API key belum dikonfigurasi dalam kode');
+                return;
+            }
+
+            const originalText = previewBtn.textContent;
+            previewBtn.textContent = '⏳ Loading...';
+            previewBtn.disabled = true;
+
+            try {
+                const voice = geminiVoices[selectedVoice];
+                const previewText = `Halo, saya ${voice.name}. ${voice.description}`;
+                
+                const audioBlob = await generateGeminiTTS(previewText, selectedVoice, true);
+                
+                if (audioBlob) {
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    previewPlayer.src = audioUrl;
+                    
+                    previewPlayer.onloadeddata = function() {
+                        previewPlayer.play().catch(err => {
+                            console.error('Error playing preview:', err);
+                            showError('Tidak dapat memutar preview audio');
+                        });
+                    };
+                    
+                    previewPlayer.addEventListener('ended', function() {
+                        URL.revokeObjectURL(audioUrl);
+                    }, { once: true });
+                }
+
+            } catch (error) {
+                console.error('Error generating preview:', error);
+                showError('Error generating preview: ' + error.message);
+            }
+
+            previewBtn.textContent = originalText;
+            previewBtn.disabled = false;
+        });
+
+        // Main generate function
         generateBtn.addEventListener('click', async function() {
             const text = textInput.value.trim();
             const selectedVoice = voiceSelect.value;
-            const selectedEmotion = emotionSelect.value;
 
             // Validation
             if (!text) {
@@ -454,7 +379,12 @@
             }
 
             if (!selectedVoice) {
-                showError('Harap pilih talent voice terlebih dahulu');
+                showError('Harap pilih voice model terlebih dahulu');
+                return;
+            }
+
+            if (!geminiApiKey || geminiApiKey === 'YOUR_API_KEY_HERE') {
+                showError('API key belum dikonfigurasi. Harap ganti YOUR_API_KEY_HERE dengan API key Gemini Anda');
                 return;
             }
 
@@ -466,226 +396,118 @@
             showLoading();
 
             try {
-                let audioBlob;
+                const audioBlob = await generateGeminiTTS(text, selectedVoice, false);
                 
-                console.log('🔄 Mencoba koneksi ke Cloudflare Worker...');
-                
-                try {
-                    // Try to call Cloudflare Worker endpoint first
-                    // Map frontend voice selection to Google TTS voice names
-                    const voiceMapping = {
-                        'female-1': 'id-ID-Standard-A',
-                        'female-2': 'id-ID-Standard-C', 
-                        'female-3': 'id-ID-Wavenet-A',
-                        'female-4': 'id-ID-Wavenet-C',
-                        'male-1': 'id-ID-Standard-B',
-                        'male-2': 'id-ID-Standard-D',
-                        'male-3': 'id-ID-Wavenet-B',
-                        'male-4': 'id-ID-Wavenet-D'
-                    };
-                    
-                    const requestData = {
-                        text: text,
-                        voiceName: voiceMapping[selectedVoice] || 'id-ID-Standard-A',
-                        speakingRate: parseFloat(speedSelect.value),
-                        pitch: parseFloat(pitchSelect.value),
-                        volumeGain: (parseFloat(volumeSelect.value) - 1) * 6, // Convert 0-1 to dB
-                        audioProfile: selectedEmotion === 'neutral' ? null : 'telephony-class-application'
-                    };
-                    
-                    console.log('📤 Mengirim data:', requestData);
-                    console.log('🌐 URL:', API_BASE_URL + '/api/text-to-speech');
-                    
-                    const response = await fetch(API_BASE_URL + '/api/text-to-speech', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(requestData)
-                    });
+                if (audioBlob) {
+                    // Create audio URL
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    audioPlayer.src = audioUrl;
 
-                    console.log('📥 Response status:', response.status);
-                    console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
-
-                    if (response.ok) {
-                        const contentType = response.headers.get('content-type');
-                        console.log('📥 Content-Type:', contentType);
-                        
-                        if (contentType && contentType.includes('audio')) {
-                            audioBlob = await response.blob();
-                            console.log('✅ Audio blob berhasil diterima, size:', audioBlob.size, 'bytes');
-                        } else {
-                            // Jika bukan audio, coba baca sebagai text untuk error message
-                            const errorText = await response.text();
-                            console.log('❌ Response bukan audio:', errorText);
-                            throw new Error(`Backend tidak mengembalikan audio: ${errorText}`);
-                        }
-                    } else {
-                        const errorText = await response.text();
-                        console.log('❌ Backend error response:', errorText);
-                        throw new Error(`Backend error ${response.status}: ${errorText}`);
-                    }
-                } catch (backendError) {
-                    console.log('❌ Backend error:', backendError.message);
-                    console.log('🔄 Menggunakan demo audio generator...');
+                    // Show audio player
+                    audioContainer.classList.remove('hidden');
                     
-                    // Fallback to demo audio generation
-                    audioBlob = await generateSampleAudio(text, selectedVoice, selectedEmotion, false);
-                    console.log('✅ Demo audio generated, size:', audioBlob.size, 'bytes');
+                    // Setup download
+                    setupDownload(audioBlob, text);
+
+                    console.log('✅ Audio berhasil dimuat dan siap diputar');
+                } else {
+                    throw new Error('Gagal menghasilkan audio');
                 }
-                
-                // Validate audio blob
-                if (!audioBlob || audioBlob.size === 0) {
-                    throw new Error('Audio blob kosong atau tidak valid');
-                }
-                
-                // Create audio URL
-                const audioUrl = URL.createObjectURL(audioBlob);
-                audioPlayer.src = audioUrl;
-
-                // Show audio player
-                audioContainer.classList.remove('hidden');
-                
-                // Setup download
-                setupDownload(audioBlob, text);
-
-                hideLoading();
-                console.log('✅ Audio berhasil dimuat dan siap diputar');
                 
             } catch (error) {
                 console.error('❌ Error dalam generate speech:', error);
-                hideLoading();
                 showError('Terjadi kesalahan saat memproses audio: ' + error.message);
             }
+
+            hideLoading();
         });
 
-        // Generate sample audio (demo purposes)
-        async function generateSampleAudio(text, voice, emotion, isPreview = false) {
+        // Generate TTS using Gemini API
+        async function generateGeminiTTS(text, voiceName, isPreview = false) {
             try {
-                console.log('🎵 Creating audio context...');
-                
-                // Create a simple audio context for demo
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // Resume audio context if suspended (required by some browsers)
-                if (audioContext.state === 'suspended') {
-                    await audioContext.resume();
-                    console.log('🔄 Audio context resumed');
+                console.log('🎤 Generating TTS with Gemini...', { text: text.substring(0, 50), voiceName, isPreview });
+
+                const payload = {
+                    contents: [{
+                        role: 'user',
+                        parts: [{
+                            text: text
+                        }]
+                    }],
+                    generationConfig: {
+                        responseModalities: ['audio'],
+                        temperature: 0.7,
+                        speech_config: {
+                            voice_config: {
+                                prebuilt_voice_config: {
+                                    voice_name: voiceName
+                                }
+                            }
+                        }
+                    }
+                };
+
+                const response = await fetch(`${GEMINI_API_URL}?key=${geminiApiKey}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                console.log('📥 Gemini response status:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ Gemini API error:', errorText);
+                    throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
                 }
-                
-                const sampleRate = audioContext.sampleRate;
-                console.log('🎵 Audio context created, sample rate:', sampleRate);
-            
-            // Set duration based on whether it's a preview or full text
-            let duration;
-            if (isPreview) {
-                duration = 3; // 3 seconds for preview
-            } else {
-                duration = Math.max(3, text.length * 0.15); // Minimum 3 seconds, scale with text
-            }
-            
-            const frameCount = sampleRate * duration;
-            const audioBuffer = audioContext.createBuffer(1, frameCount, sampleRate);
-            const channelData = audioBuffer.getChannelData(0);
-            
-            // Generate a more realistic voice pattern
-            const voiceInfo = voiceData[voice];
-            const emotionInfo = emotionSettings[emotion];
-            
-            // Base frequency based on gender and voice characteristics
-            let baseFreq = voiceInfo.gender === 'female' ? 200 : 120;
-            
-            // Adjust for voice tone
-            switch(voiceInfo.tone) {
-                case 'deep': baseFreq -= 30; break;
-                case 'young': baseFreq += 20; break;
-                case 'soft': baseFreq += 10; break;
-                case 'firm': baseFreq -= 10; break;
-            }
-            
-            // Adjust for emotion
-            baseFreq += emotionInfo.pitch * 40;
-            
-            for (let i = 0; i < frameCount; i++) {
-                const t = i / sampleRate;
-                
-                // Create speech-like patterns
-                const wordFreq = 2 + Math.sin(t * 3) * 0.5; // Word rhythm
-                const syllableFreq = 8 + Math.sin(t * 12) * 2; // Syllable rhythm
-                
-                // Frequency modulation based on text content
-                let frequency = baseFreq;
-                if (!isPreview && text.length > 0) {
-                    const textIndex = Math.floor((t / duration) * text.length);
-                    const char = text.charCodeAt(textIndex % text.length) || 65;
-                    frequency += (char % 50) - 25; // Vary frequency based on character
+
+                const responseText = await response.text();
+                console.log('📄 Raw response length:', responseText.length);
+
+                // Parse streaming response
+                const chunks = responseText.trim().split('\n').filter(line => line.trim());
+                let audioData = null;
+
+                for (const chunk of chunks) {
+                    try {
+                        const parsed = JSON.parse(chunk);
+                        console.log('📦 Processing chunk:', Object.keys(parsed));
+                        
+                        if (parsed.candidates?.[0]?.content?.parts?.[0]?.inlineData) {
+                            const inlineData = parsed.candidates[0].content.parts[0].inlineData;
+                            if (inlineData.mimeType && inlineData.mimeType.includes('audio') && inlineData.data) {
+                                audioData = inlineData.data;
+                                console.log('🎵 Found audio data, length:', audioData.length);
+                                break;
+                            }
+                        }
+                    } catch (parseError) {
+                        console.log('⚠️ Skipping non-JSON chunk:', chunk.substring(0, 100));
+                    }
                 }
-                
-                // Generate more natural waveform
-                const envelope = Math.exp(-t * 0.3) * (1 - Math.exp(-t * 10)); // Attack and decay
-                const vibrato = 1 + Math.sin(t * 6) * 0.02; // Slight vibrato
-                
-                const wave1 = Math.sin(2 * Math.PI * frequency * t * vibrato);
-                const wave2 = Math.sin(2 * Math.PI * frequency * 2 * t) * 0.3; // Harmonic
-                const wave3 = Math.sin(2 * Math.PI * frequency * 3 * t) * 0.1; // Higher harmonic
-                
-                const speechPattern = Math.sin(wordFreq * t) * Math.sin(syllableFreq * t);
-                
-                channelData[i] = (wave1 + wave2 + wave3) * envelope * speechPattern * 0.15;
-            }
-            
-                // Convert to WAV blob
-                const wavBlob = audioBufferToWav(audioBuffer);
-                console.log('✅ WAV blob created, size:', wavBlob.size, 'bytes');
-                
-                // Close audio context to free resources
-                await audioContext.close();
-                
-                return wavBlob;
-                
+
+                if (!audioData) {
+                    throw new Error('Tidak ada data audio dalam response Gemini');
+                }
+
+                // Convert base64 to blob
+                const binaryString = atob(audioData);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+
+                const audioBlob = new Blob([bytes], { type: 'audio/wav' });
+                console.log('✅ Audio blob created, size:', audioBlob.size, 'bytes');
+
+                return audioBlob;
+
             } catch (error) {
-                console.error('❌ Error in generateSampleAudio:', error);
+                console.error('❌ Error in generateGeminiTTS:', error);
                 throw error;
             }
-        }
-
-        // Convert AudioBuffer to WAV blob
-        function audioBufferToWav(buffer) {
-            const length = buffer.length;
-            const arrayBuffer = new ArrayBuffer(44 + length * 2);
-            const view = new DataView(arrayBuffer);
-            const channelData = buffer.getChannelData(0);
-            
-            // WAV header
-            const writeString = (offset, string) => {
-                for (let i = 0; i < string.length; i++) {
-                    view.setUint8(offset + i, string.charCodeAt(i));
-                }
-            };
-            
-            writeString(0, 'RIFF');
-            view.setUint32(4, 36 + length * 2, true);
-            writeString(8, 'WAVE');
-            writeString(12, 'fmt ');
-            view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true);
-            view.setUint16(22, 1, true);
-            view.setUint32(24, buffer.sampleRate, true);
-            view.setUint32(28, buffer.sampleRate * 2, true);
-            view.setUint16(32, 2, true);
-            view.setUint16(34, 16, true);
-            writeString(36, 'data');
-            view.setUint32(40, length * 2, true);
-            
-            // Convert float samples to 16-bit PCM
-            let offset = 44;
-            for (let i = 0; i < length; i++) {
-                const sample = Math.max(-1, Math.min(1, channelData[i]));
-                view.setInt16(offset, sample * 0x7FFF, true);
-                offset += 2;
-            }
-            
-            return new Blob([arrayBuffer], { type: 'audio/wav' });
         }
 
         // Setup download functionality
@@ -694,7 +516,7 @@
                 const url = URL.createObjectURL(audioBlob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `tts_${text.substring(0, 20).replace(/[^a-zA-Z0-9]/g, '_')}.wav`;
+                a.download = `gemini_tts_${text.substring(0, 20).replace(/[^a-zA-Z0-9]/g, '_')}.wav`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -729,14 +551,14 @@
         // Utility functions
         function showLoading() {
             generateBtn.disabled = true;
-            btnText.textContent = 'Memproses...';
+            btnText.textContent = 'Memproses dengan Gemini AI...';
             generateBtn.classList.add('opacity-50', 'cursor-not-allowed');
             status.classList.remove('hidden');
         }
 
         function hideLoading() {
             generateBtn.disabled = false;
-            btnText.textContent = '🎤 Generate Suara';
+            btnText.textContent = '🎤 Generate Suara AI';
             generateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             status.classList.add('hidden');
         }
@@ -744,102 +566,19 @@
         function showError(message) {
             errorText.textContent = message;
             errorMessage.classList.remove('hidden');
-            setTimeout(hideError, 5000);
+            setTimeout(hideError, 8000);
         }
 
         function hideError() {
             errorMessage.classList.add('hidden');
         }
 
-        // Voice selection change handler
-        voiceSelect.addEventListener('change', function() {
-            if (this.value && voiceData[this.value]) {
-                const voice = voiceData[this.value];
-                
-                // Show voice preview section
-                voicePreviewName.textContent = voice.name;
-                voicePreviewDesc.textContent = voice.description;
-                voicePreview.classList.remove('hidden');
-                
-                console.log(`Selected voice: ${voice.name} (${voice.description})`);
-            } else {
-                // Hide preview if no voice selected
-                voicePreview.classList.add('hidden');
-            }
-        });
-
-        // Preview button handler
-        previewBtn.addEventListener('click', async function() {
-            const selectedVoice = voiceSelect.value;
-            if (!selectedVoice) return;
-
-            const originalText = previewBtn.textContent;
-            previewBtn.textContent = '⏳ Loading...';
-            previewBtn.disabled = true;
-
-            try {
-                console.log('🔊 Generating preview for voice:', selectedVoice);
-                
-                // Generate preview audio
-                const previewText = `Halo, saya ${voiceData[selectedVoice].name}. ${voiceData[selectedVoice].description}`;
-                const audioBlob = await generateSampleAudio(previewText, selectedVoice, 'neutral', true);
-                
-                console.log('✅ Preview audio generated, size:', audioBlob.size, 'bytes');
-                
-                // Play preview
-                const audioUrl = URL.createObjectURL(audioBlob);
-                previewPlayer.src = audioUrl;
-                
-                // Add event listeners for preview player
-                previewPlayer.onloadeddata = function() {
-                    console.log('🎵 Preview audio loaded, duration:', previewPlayer.duration, 'seconds');
-                    previewPlayer.play().then(() => {
-                        console.log('▶️ Preview playing...');
-                    }).catch(err => {
-                        console.error('❌ Error playing preview:', err);
-                        showError('Tidak dapat memutar preview audio');
-                    });
-                };
-                
-                previewPlayer.onerror = function(e) {
-                    console.error('❌ Preview audio error:', e);
-                    showError('Error loading preview audio');
-                };
-
-                previewBtn.textContent = '🔊 Preview';
-                previewBtn.disabled = false;
-
-                // Clean up URL after playing
-                previewPlayer.addEventListener('ended', function() {
-                    console.log('🔚 Preview ended');
-                    URL.revokeObjectURL(audioUrl);
-                }, { once: true });
-
-            } catch (error) {
-                console.error('❌ Error generating preview:', error);
-                showError('Error generating preview: ' + error.message);
-                previewBtn.textContent = '🔊 Preview';
-                previewBtn.disabled = false;
-            }
-        });
-
-        // Emotion selection change handler
-        emotionSelect.addEventListener('change', function() {
-            if (this.value && emotionSettings[this.value]) {
-                const emotion = emotionSettings[this.value];
-                // Auto-adjust speed and pitch based on emotion
-                speedSelect.value = emotion.speed;
-                pitchSelect.value = emotion.pitch;
-                console.log(`Selected emotion: ${this.value} (${emotion.description})`);
-            }
-        });
-
         // Sample text suggestions
         const sampleTexts = [
-            "Halo, selamat datang di aplikasi text to speech kami!",
-            "Teknologi AI memungkinkan kita mengubah teks menjadi suara yang natural.",
-            "Hari ini cuaca sangat cerah dan menyenangkan untuk beraktivitas.",
-            "Terima kasih telah menggunakan layanan kami. Semoga hari Anda menyenangkan!"
+            "Halo, selamat datang di era baru text-to-speech dengan teknologi Gemini AI!",
+            "Teknologi kecerdasan buatan telah mengubah cara kita berinteraksi dengan komputer.",
+            "Hari ini adalah hari yang indah untuk menjelajahi kemampuan suara AI yang menakjubkan.",
+            "Terima kasih telah menggunakan Gemini TTS. Nikmati pengalaman suara berkualitas tinggi!"
         ];
 
         // Add sample text on empty input focus
@@ -850,5 +589,5 @@
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'987117d9b34644c9',t:'MTc1OTIwNzc2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98712d8ec2566097',t:'MTc1OTIwODY1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
