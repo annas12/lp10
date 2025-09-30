@@ -327,11 +327,6 @@
                 return;
             }
 
-            if (!geminiApiKey || geminiApiKey === 'YOUR_API_KEY_HERE') {
-                showError('API key belum dikonfigurasi dalam kode');
-                return;
-            }
-
             const originalText = previewBtn.textContent;
             previewBtn.textContent = '⏳ Loading...';
             previewBtn.disabled = true;
@@ -339,8 +334,20 @@
             try {
                 const voice = geminiVoices[selectedVoice];
                 const previewText = `Halo, saya ${voice.name}. ${voice.description}`;
+                let audioBlob = null;
                 
-                const audioBlob = await generateGeminiTTS(previewText, selectedVoice, true);
+                // Try Gemini first if API key is configured
+                if (geminiApiKey && geminiApiKey !== 'YOUR_API_KEY_HERE') {
+                    try {
+                        audioBlob = await generateGeminiTTS(previewText, selectedVoice, true);
+                    } catch (geminiError) {
+                        console.log('⚠️ Gemini preview gagal, menggunakan browser TTS:', geminiError.message);
+                        audioBlob = await generateBrowserTTS(previewText, selectedVoice);
+                    }
+                } else {
+                    // Use browser TTS if no API key
+                    audioBlob = await generateBrowserTTS(previewText, selectedVoice);
+                }
                 
                 if (audioBlob) {
                     const audioUrl = URL.createObjectURL(audioBlob);
@@ -383,11 +390,6 @@
                 return;
             }
 
-            if (!geminiApiKey || geminiApiKey === 'YOUR_API_KEY_HERE') {
-                showError('API key belum dikonfigurasi. Harap ganti YOUR_API_KEY_HERE dengan API key Gemini Anda');
-                return;
-            }
-
             // Hide previous results and errors
             hideError();
             audioContainer.classList.add('hidden');
@@ -396,7 +398,31 @@
             showLoading();
 
             try {
-                const audioBlob = await generateGeminiTTS(text, selectedVoice, false);
+                let audioBlob = null;
+                
+                // Try Gemini first if API key is configured
+                if (geminiApiKey && geminiApiKey !== 'YOUR_API_KEY_HERE') {
+                    try {
+                        audioBlob = await generateGeminiTTS(text, selectedVoice, false);
+                        console.log('✅ Gemini TTS berhasil');
+                    } catch (geminiError) {
+                        console.log('⚠️ Gemini TTS gagal, mencoba fallback:', geminiError.message);
+                        
+                        // Check if it's a quota error
+                        if (geminiError.message.includes('429') || geminiError.message.includes('quota')) {
+                            showWarning('Quota Gemini habis, menggunakan TTS browser sebagai alternatif...');
+                            await new Promise(resolve => setTimeout(resolve, 2000)); // Show warning for 2 seconds
+                        }
+                        
+                        // Fallback to browser TTS
+                        audioBlob = await generateBrowserTTS(text, selectedVoice);
+                    }
+                } else {
+                    // Use browser TTS if no API key
+                    showWarning('Menggunakan TTS browser (API key belum dikonfigurasi)...');
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    audioBlob = await generateBrowserTTS(text, selectedVoice);
+                }
                 
                 if (audioBlob) {
                     // Create audio URL
@@ -411,7 +437,7 @@
 
                     console.log('✅ Audio berhasil dimuat dan siap diputar');
                 } else {
-                    throw new Error('Gagal menghasilkan audio');
+                    throw new Error('Gagal menghasilkan audio dengan semua metode');
                 }
                 
             } catch (error) {
@@ -421,6 +447,92 @@
 
             hideLoading();
         });
+
+        // Generate TTS using Browser Speech Synthesis (Fallback)
+        async function generateBrowserTTS(text, voiceName) {
+            return new Promise((resolve, reject) => {
+                try {
+                    console.log('🎤 Generating TTS with Browser Speech Synthesis...');
+                    
+                    if (!('speechSynthesis' in window)) {
+                        throw new Error('Browser tidak mendukung Speech Synthesis');
+                    }
+
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    
+                    // Voice mapping for browser TTS
+                    const voices = speechSynthesis.getVoices();
+                    let selectedVoice = null;
+                    
+                    // Try to find Indonesian voice first
+                    selectedVoice = voices.find(voice => 
+                        voice.lang.includes('id') || voice.lang.includes('ID')
+                    );
+                    
+                    // If no Indonesian voice, try English
+                    if (!selectedVoice) {
+                        selectedVoice = voices.find(voice => 
+                            voice.lang.includes('en') || voice.lang.includes('EN')
+                        );
+                    }
+                    
+                    // Use first available voice as last resort
+                    if (!selectedVoice && voices.length > 0) {
+                        selectedVoice = voices[0];
+                    }
+                    
+                    if (selectedVoice) {
+                        utterance.voice = selectedVoice;
+                        console.log('🔊 Using voice:', selectedVoice.name);
+                    }
+
+                    // Apply settings
+                    utterance.rate = parseFloat(speedRange.value);
+                    utterance.pitch = 1 + (parseFloat(pitchRange.value) / 20); // Convert -20 to 20 range to 0 to 2
+                    utterance.volume = parseFloat(volumeRange.value) / 100;
+
+                    // Create audio context for recording
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const destination = audioContext.createMediaStreamDestination();
+                    const mediaRecorder = new MediaRecorder(destination.stream);
+                    const audioChunks = [];
+
+                    mediaRecorder.ondataavailable = event => {
+                        audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        resolve(audioBlob);
+                    };
+
+                    utterance.onstart = () => {
+                        mediaRecorder.start();
+                    };
+
+                    utterance.onend = () => {
+                        setTimeout(() => {
+                            mediaRecorder.stop();
+                            audioContext.close();
+                        }, 500);
+                    };
+
+                    utterance.onerror = (event) => {
+                        console.error('Speech synthesis error:', event);
+                        mediaRecorder.stop();
+                        audioContext.close();
+                        reject(new Error('Browser TTS error: ' + event.error));
+                    };
+
+                    // Start speech synthesis
+                    speechSynthesis.speak(utterance);
+
+                } catch (error) {
+                    console.error('❌ Error in generateBrowserTTS:', error);
+                    reject(error);
+                }
+            });
+        }
 
         // Generate TTS using Gemini API
         async function generateGeminiTTS(text, voiceName, isPreview = false) {
@@ -569,8 +681,17 @@
             setTimeout(hideError, 8000);
         }
 
+        function showWarning(message) {
+            // Temporarily change error message to warning style
+            errorText.textContent = message;
+            errorMessage.className = 'bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4 text-yellow-200 text-center';
+            errorMessage.classList.remove('hidden');
+        }
+
         function hideError() {
             errorMessage.classList.add('hidden');
+            // Reset to error style
+            errorMessage.className = 'hidden bg-red-500/20 border border-red-500/50 rounded-lg p-4 text-red-200 text-center';
         }
 
         // Sample text suggestions
@@ -589,5 +710,5 @@
             }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98712d8ec2566097',t:'MTc1OTIwODY1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98713549e0aa9fd7',t:'MTc1OTIwODk2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
