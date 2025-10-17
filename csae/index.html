@@ -1,1 +1,149 @@
-hello
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Standar Keselamatan Anak • Child Safety Policy</title>
+  <meta name="description" content="Kebijakan keselamatan anak (Child Safety Policy) untuk aplikasi kami. / Our app's Child Safety Policy." />
+  <style>
+    :root{
+      --bg:#0f172a;        /* slate-900 */
+      --card:#111827;      /* gray-900 */
+      --text:#e5e7eb;      /* gray-200 */
+      --muted:#9ca3af;     /* gray-400 */
+      --accent:#22c55e;    /* green-500 */
+      --link:#60a5fa;      /* blue-400 */
+      --border:#1f2937;    /* gray-800 */
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      background:linear-gradient(180deg,#0b1220, var(--bg));
+      color:var(--text); line-height:1.6;
+    }
+    .wrap{max-width:920px; margin:auto; padding:28px 20px 64px}
+    header{display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; align-items:center; margin-bottom:20px}
+    h1{font-size:clamp(22px,3.5vw,34px); margin:0}
+    .lang{
+      display:flex; gap:8px; align-items:center;
+      background:var(--card); padding:6px; border-radius:12px; border:1px solid var(--border)
+    }
+    .lang a{
+      text-decoration:none; color:var(--muted); padding:6px 10px; border-radius:8px; font-weight:600
+    }
+    .lang a.active{background:#0b1220;color:#fff}
+    .card{
+      background:var(--card); border:1px solid var(--border);
+      border-radius:16px; padding:22px; margin:14px 0 24px
+    }
+    h2{margin:0 0 10px; font-size:clamp(18px,2.8vw,24px)}
+    h3{margin:18px 0 8px; font-size:18px}
+    ul{padding-left:20px; margin:8px 0}
+    a{color:var(--link)}
+    .meta{color:var(--muted); font-size:14px; margin-top:6px}
+    .pill{
+      display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px;
+      background:#0b1220; border:1px solid var(--border); color:var(--muted); margin-left:6px
+    }
+    footer{margin-top:28px; color:var(--muted); font-size:14px}
+    .notice{border-left:4px solid var(--accent); padding:10px 12px; background:#0d1b2a; border-radius:10px; margin:10px 0}
+    .grid{display:grid; gap:16px}
+    @media (min-width:700px){ .grid{grid-template-columns:1fr 1fr} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Standar Keselamatan Anak <span class="pill">Child Safety Policy</span></h1>
+      <nav class="lang" aria-label="Language">
+        <a href="#id" class="active" onclick="setLang('id')">Indonesia</a>
+        <a href="#en" onclick="setLang('en')">English</a>
+      </nav>
+    </header>
+
+    <!-- Indonesian -->
+    <section id="id" class="card" lang="id">
+      <h2>Komitmen Kami</h2>
+      <p>Kami berkomitmen melindungi keselamatan, privasi, dan kesejahteraan anak-anak yang menggunakan aplikasi ini. Aplikasi kami tidak ditujukan bagi anak di bawah usia yang mensyaratkan persetujuan orang tua/wali tanpa pengawasan, dan kami menolak keras segala bentuk penyalahgunaan yang melibatkan anak.</p>
+
+      <h3>Kebijakan & Tindakan</h3>
+      <ul>
+        <li><strong>Larangan eksploitasi anak.</strong> Kami melarang konten/aktivitas apa pun yang mengandung pelecehan atau eksploitasi seksual terhadap anak (CSAE) dan akan menindak tegas pelanggaran.</li>
+        <li><strong>Perlindungan data pribadi.</strong> Kami tidak mengumpulkan data pribadi anak tanpa persetujuan terverifikasi dari orang tua/wali.</li>
+        <li><strong>Moderasi & penegakan.</strong> Laporan pelanggaran ditinjau segera, akun/konten dapat dibatasi atau dihapus, dan kami akan bekerja sama dengan penegak hukum bila diperlukan.</li>
+        <li><strong>Edukasi & perbaikan berkelanjutan.</strong> Kami meninjau kebijakan dan fitur keselamatan secara berkala agar selaras dengan standar global.</li>
+      </ul>
+
+      <h3>Pelaporan</h3>
+      <div class="notice">
+        Jika Anda menemukan konten atau perilaku mencurigakan/berbahaya, segera hubungi kami:
+        <br />📧 <a href="mailto:sopport.offisial@gmail.com">sopport.offisial@gmail.com</a>
+      </div>
+
+      <h3>Referensi Kebijakan</h3>
+      <p>Lihat juga <a target="_blank" rel="noopener" href="https://support.google.com/googleplay/android-developer/answer/113469#child-safety">Kebijakan Keselamatan Anak Google Play</a>.</p>
+
+      <p class="meta">Terakhir diperbarui: <time datetime="2025-10-08">8 Okt 2025</time></p>
+    </section>
+
+    <!-- English -->
+    <section id="en" class="card" lang="en" hidden>
+      <h2>Our Commitment</h2>
+      <p>We are committed to protecting the safety, privacy, and well-being of children who use this app. Our app is not intended for children under the age requiring parental/guardian consent without supervision, and we strictly prohibit any misuse involving minors.</p>
+
+      <h3>Policies & Actions</h3>
+      <ul>
+        <li><strong>No child exploitation.</strong> We prohibit any content or activity involving child sexual abuse or exploitation (CSAE) and will take strict enforcement actions.</li>
+        <li><strong>Personal data protection.</strong> We do not collect children’s personal information without verified parental or guardian consent.</li>
+        <li><strong>Moderation & enforcement.</strong> Reports are reviewed promptly; accounts/content may be restricted or removed, and we will cooperate with law enforcement where required.</li>
+        <li><strong>Education & continuous improvement.</strong> We regularly review our policies and safety features to align with global standards.</li>
+      </ul>
+
+      <h3>Reporting</h3>
+      <div class="notice">
+        If you encounter suspicious or harmful content/behavior, please contact us:
+        <br />📧 <a href="mailto:sopport.offisial@gmail.com">sopport.offisial@gmail.com</a>
+      </div>
+
+      <h3>Policy Reference</h3>
+      <p>See also <a target="_blank" rel="noopener" href="https://support.google.com/googleplay/android-developer/answer/113469#child-safety">Google Play’s Child Safety Policy</a>.</p>
+
+      <p class="meta">Last updated: <time datetime="2025-10-08">Oct 8, 2025</time></p>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Kontak</h2>
+        <p>Untuk pertanyaan kebijakan ini atau permintaan penghapusan data anak, hubungi: <a href="mailto:sopport.offisial@gmail.com">sopport.offisial@gmail.com</a>.</p>
+      </section>
+      <section class="card">
+        <h2>Contact</h2>
+        <p>For questions about this policy or children’s data deletion requests, contact: <a href="mailto:sopport.offisial@gmail.com">sopport.offisial@gmail.com</a>.</p>
+      </section>
+    </div>
+
+    <footer>
+      © <span id="y"></span> Kalkulator Weton. All rights reserved.
+    </footer>
+  </div>
+
+  <script>
+    // simple language toggle without page reload
+    function setLang(code){
+      const id = document.getElementById('id');
+      const en = document.getElementById('en');
+      const links = document.querySelectorAll('.lang a');
+      if(code === 'en'){ id.hidden = true; en.hidden = false; }
+      else { id.hidden = false; en.hidden = true; }
+      links.forEach(a => a.classList.toggle('active', a.textContent.toLowerCase().includes(code==='en'?'english':'indonesia')));
+      history.replaceState(null, '', '#'+code);
+    }
+    // initialize from hash
+    (function(){
+      document.getElementById('y').textContent = new Date().getFullYear();
+      const h = (location.hash||'').replace('#','');
+      if(h==='en'||h==='id') setLang(h);
+    })();
+  </script>
+</body>
+</html>
