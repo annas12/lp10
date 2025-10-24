@@ -1,0 +1,8 @@
+# robots.txt untuk https://lp10.affiliateid.my.id
+# Izinkan semua mesin pencari mengindeks seluruh halaman
+
+User-agent: *
+Allow: /
+
+# (Opsional) tambahkan sitemap untuk membantu Google menemukan semua halaman
+Sitemap: https://lp10.affiliateid.my.id/sitemap.xml
